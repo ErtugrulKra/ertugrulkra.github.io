@@ -1,0 +1,67 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+
+const { params } = Astro;
+const slug = params.slug!;
+
+// Get all posts
+const posts = await getCollection('en-posts', ({ data }) => {
+  return data.lang === 'en';
+});
+
+// Find the post
+const post = posts.find((p) => p.slug === slug);
+
+if (!post) {
+  return Astro.redirect('/blog/', 404);
+}
+
+const { Content } = await post.render();
+---
+
+<BaseLayout
+  title={`${post.data.title} - Ertugrul Kara`}
+  description={post.data.description || 'A blog post by Ertugrul Kara'}
+  lang="en"
+  currentPath={`/blog/${slug}/`}
+>
+  <article class="container mx-auto px-4 py-16 max-w-4xl">
+    <header class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4 text-slate-800">{post.data.title}</h1>
+      
+      <div class="flex flex-wrap items-center gap-4 text-sm text-slate-600 mb-6">
+        <time datetime={post.data.pubDate.toISOString()}>
+          {post.data.pubDate.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+          })}
+        </time>
+        
+        {post.data.author && (
+          <span class="text-slate-500">by {post.data.author}</span>
+        )}
+      </div>
+      
+      {post.data.tags && post.data.tags.length > 0 && (
+        <div class="flex flex-wrap gap-2">
+          {post.data.tags.map((tag: string) => (
+            <a
+              href={`/tags/${tag}/`}
+              class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors"
+            >
+              #{tag}
+            </a>
+          ))}
+        </div>
+      )}
+    </header>
+    
+    <div class="prose prose-lg prose-slate max-w-none">
+      <Content />
+    </div>
+  </article>
+</BaseLayout>
+
