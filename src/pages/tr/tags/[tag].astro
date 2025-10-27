@@ -1,0 +1,55 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PostCard from '@components/PostCard.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('tr-posts');
+  const tags = new Set<string>();
+  
+  posts.forEach((post) => {
+    post.data.tags?.forEach((tag) => tags.add(tag));
+  });
+
+  return Array.from(tags).map((tag) => ({
+    params: { tag },
+  }));
+}
+
+const { tag } = Astro.params;
+const posts = await getCollection('tr-posts', ({ data }) => {
+  return data.lang === 'tr' && data.tags?.includes(tag || '');
+});
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+---
+
+<BaseLayout
+  title={`Etiket: ${tag} - Ertugrul Kara`}
+  description={`${tag} etiketli yazılar`}
+  lang="tr"
+  currentPath={`/tr/tags/${tag}`}
+>
+  <div class="container mx-auto px-4 py-16">
+    <header class="mb-12">
+      <h1 class="text-4xl font-bold mb-4">
+        {tag} etiketli yazılar
+      </h1>
+      <p class="text-xl text-gray-600 dark:text-gray-400">
+        {sortedPosts.length} yazı bulundu
+      </p>
+    </header>
+
+    <div class="grid md:grid-cols-2 gap-8">
+      {sortedPosts.map((post) => (
+        <PostCard post={post.data} slug={post.slug} lang="tr" />
+      ))}
+    </div>
+
+    {sortedPosts.length === 0 && (
+      <p class="text-center text-gray-500 dark:text-gray-400 mt-12">
+        Bu etiketle yazı bulunamadı.
+      </p>
+    )}
+  </div>
+</BaseLayout>
+

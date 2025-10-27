@@ -1,0 +1,106 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('en-posts');
+  return posts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await post.render();
+---
+
+<BaseLayout
+  title={`${post.data.title} - Ertugrul Kara`}
+  description={post.data.description || post.data.title}
+  lang="en"
+  currentPath={`/en/blog/${post.slug}`}
+>
+  <div class="container mx-auto px-4 py-16">
+    <article class="prose prose-lg max-w-4xl mx-auto">
+    <header class="mb-12">
+      <h1 class="text-4xl md:text-5xl font-bold mb-4">{post.data.title}</h1>
+      
+      <div class="flex flex-wrap items-center gap-4 text-slate-600 mb-6">
+          <time datetime={post.data.pubDate.toISOString()}>
+            {post.data.pubDate.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'long',
+              day: 'numeric',
+            })}
+          </time>
+          
+          {post.data.author && <span>by {post.data.author}</span>}
+        </div>
+        
+        {post.data.description && (
+          <p class="text-xl text-slate-600">{post.data.description}</p>
+        )}
+        
+        {post.data.tags && post.data.tags.length > 0 && (
+          <div class="flex flex-wrap gap-2 mt-4">
+            {post.data.tags.map((tag) => (
+              <a
+                href={`/en/tags/${tag}`}
+                class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-sm hover:bg-slate-200 transition-colors"
+              >
+                {tag}
+              </a>
+            ))}
+          </div>
+        )}
+      </header>
+      
+      <div class="post-content">
+        <Content />
+      </div>
+    </article>
+  </div>
+</BaseLayout>
+
+<style>
+  :global(.post-content h2) {
+    @apply text-3xl font-bold mt-12 mb-4;
+  }
+  
+  :global(.post-content h3) {
+    @apply text-2xl font-bold mt-8 mb-3;
+  }
+  
+  :global(.post-content p) {
+    @apply mb-4 leading-relaxed;
+  }
+  
+  :global(.post-content a) {
+    @apply text-slate-600 hover:text-slate-800 underline;
+  }
+  
+  :global(.post-content code) {
+    @apply bg-gray-200 px-1 py-0.5 rounded text-sm;
+  }
+  
+  :global(.post-content pre) {
+    @apply bg-gray-200 p-4 rounded-lg overflow-x-auto mb-4;
+  }
+  
+  :global(.post-content ul, .post-content ol) {
+    @apply mb-4 pl-6;
+  }
+  
+  :global(.post-content ul) {
+    @apply list-disc;
+  }
+  
+  :global(.post-content ol) {
+    @apply list-decimal;
+  }
+  
+  :global(.post-content blockquote) {
+    @apply border-l-4 border-slate-500 pl-4 italic text-slate-600 my-4;
+  }
+</style>
+

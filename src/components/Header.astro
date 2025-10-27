@@ -1,0 +1,30 @@
+---
+import LanguageToggle from './LanguageToggle.astro';
+
+const { currentLang = 'en', currentPath = '/' } = Astro.props;
+---
+
+<header class="sticky top-0 z-50 bg-slate-300/95 backdrop-blur-md border-b border-slate-400 shadow-sm">
+  <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
+    <a href={`/${currentLang}/`} class="text-2xl font-bold text-slate-600 hover:text-slate-800 transition-colors">
+      Ertugrul Kara
+    </a>
+    
+    <div class="flex items-center gap-4">
+      <a
+        href={`/${currentLang}/blog/`}
+        class="px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors"
+      >
+        Blog
+      </a>
+      <a
+        href={`/${currentLang}/about/`}
+        class="px-3 py-2 rounded-lg text-gray-600 hover:bg-gray-200 transition-colors"
+      >
+        About
+      </a>
+      <LanguageToggle currentLang={currentLang} currentPath={currentPath} />
+    </div>
+  </nav>
+</header>
+

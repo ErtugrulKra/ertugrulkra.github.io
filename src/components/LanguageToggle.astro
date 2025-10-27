@@ -1,0 +1,18 @@
+---
+const { currentLang, currentPath = '/' } = Astro.props;
+const otherLang = currentLang === 'en' ? 'tr' : 'en';
+// Replace the lang prefix and ensure trailing slash
+let otherLangPath = currentPath.replace(`/${currentLang}/`, `/${otherLang}/`);
+if (!otherLangPath.endsWith('/')) {
+  otherLangPath = `/${otherLang}/`;
+}
+---
+
+<a
+  href={otherLangPath}
+  class="px-4 py-2 rounded-lg bg-slate-700 text-white hover:bg-slate-800 transition-colors"
+  aria-label={`Switch to ${otherLang.toUpperCase()}`}
+>
+  {otherLang.toUpperCase()}
+</a>
+

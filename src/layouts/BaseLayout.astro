@@ -1,0 +1,84 @@
+---
+import Header from '@components/Header.astro';
+import Footer from '@components/Footer.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: string;
+  currentPath?: string;
+  image?: string;
+}
+
+const { title, description = 'Personal website of Ertugrul Kara', lang = 'en', currentPath = '/', image } = Astro.props;
+const canonical = new URL(currentPath, Astro.site);
+const ogImage = image || new URL('/og-image.png', Astro.site).href;
+---
+
+<!DOCTYPE html>
+<html lang={lang}>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    
+    <!-- Hreflang -->
+    {lang === 'en' ? (
+      <>
+        <link rel="alternate" hreflang="en" href={canonical} />
+        <link rel="alternate" hreflang="tr" href={canonical.href.replace('/en/', '/tr/')} />
+      </>
+    ) : (
+      <>
+        <link rel="alternate" hreflang="tr" href={canonical} />
+        <link rel="alternate" hreflang="en" href={canonical.href.replace('/tr/', '/en/')} />
+      </>
+    )}
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    
+    <!-- Styles -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    
+    <!-- Lunr.js for search -->
+    <script src="https://unpkg.com/lunr@2.3.9/lunr.min.js"></script>
+  </head>
+  <body class="font-sans bg-slate-50">
+    <Header currentLang={lang} currentPath={currentPath} />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --font-sans: 'Inter', sans-serif;
+  }
+  
+  html {
+    font-family: var(--font-sans);
+  }
+</style>
+

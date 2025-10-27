@@ -1,0 +1,57 @@
+---
+interface MediumPost {
+  title: string;
+  link: string;
+  pubDate: string;
+  contentSnippet: string;
+  categories: string[];
+  guid: string;
+  author: string;
+}
+
+const { post, lang } = Astro.props;
+
+const date = new Date(post.pubDate);
+---
+
+<article
+  class="border border-gray-300 rounded-lg p-6 hover:shadow-lg transition-shadow bg-slate-50 shadow-sm"
+>
+  <div class="flex items-center gap-2 mb-2">
+    <span class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-xs font-semibold">
+      Medium
+    </span>
+  </div>
+  
+  <h2 class="text-xl font-bold mb-2">
+    <a href={post.link} target="_blank" rel="noopener noreferrer" class="text-slate-700 hover:text-slate-900">
+      {post.title}
+    </a>
+  </h2>
+  
+  {post.contentSnippet && <p class="text-slate-600 mb-4">{post.contentSnippet}</p>}
+  
+  <div class="flex flex-wrap gap-2 mb-4">
+    {post.categories.map((tag) => (
+      <span
+        class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-sm"
+      >
+        {tag}
+      </span>
+    ))}
+  </div>
+  
+  <div class="flex items-center justify-between text-sm text-slate-500">
+    <time datetime={date.toISOString()}>
+      {date.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })}
+    </time>
+    <a href={post.link} target="_blank" rel="noopener noreferrer" class="text-slate-600 hover:text-slate-800 hover:underline flex items-center gap-1">
+      {lang === 'en' ? 'Read on Medium →' : 'Medium\'da Oku →'}
+    </a>
+  </div>
+</article>
+
