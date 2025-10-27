@@ -73,7 +73,7 @@
         }
 
         resultsDiv.innerHTML = results.map((post: any) => `
-          <a href="/${post.lang}/blog/${post.slug}" class="block p-3 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
+          <a href="/${post.lang}/blog/${post.slug}" class="block p-3 border border-gray-300 rounded-lg hover:bg-gray-100">
             <h3 class="font-semibold">${post.title}</h3>
             ${post.description ? `<p class="text-sm text-gray-600 mt-1">${post.description}</p>` : ''}
           </a>

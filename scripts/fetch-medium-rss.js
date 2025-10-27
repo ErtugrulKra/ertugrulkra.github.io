@@ -33,7 +33,7 @@ async function fetchMediumPosts() {
     console.log(`✓ Saved to ${outputPath}`);
   } catch (error) {
     console.error('Error fetching Medium RSS:', error);
-    process.exit(1);
+    // Don't exit with error, just log it
   }
 }
 

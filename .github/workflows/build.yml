@@ -32,6 +32,9 @@ jobs:
           rm -rf node_modules package-lock.json
           npm install
 
+      - name: Fetch Medium posts
+        run: npm run fetch-medium
+
       - name: Build search index
         run: npm run build-search-index
 
