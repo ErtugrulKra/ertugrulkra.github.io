@@ -1,4 +1,17 @@
 ---
+interface Props {
+  post: {
+    title: string;
+    pubDate: Date;
+    description?: string;
+    tags?: string[];
+    author?: string;
+    lang: string;
+  };
+  slug: string;
+  lang: string;
+}
+
 const { post, slug, lang } = Astro.props;
 const { title, pubDate, description, tags = [] } = post;
 ---
@@ -13,7 +26,7 @@ const { title, pubDate, description, tags = [] } = post;
   {description && <p class="text-slate-600 mb-4">{description}</p>}
   
   <div class="flex flex-wrap gap-2 mb-4">
-    {tags.map((tag) => (
+    {tags.map((tag: string) => (
       <a
         href={`/${lang}/tags/${tag}/`}
         class="px-2 py-1 bg-slate-100 text-slate-700 rounded text-sm hover:bg-slate-200 transition-colors"

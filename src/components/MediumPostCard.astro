@@ -9,6 +9,11 @@ interface MediumPost {
   author: string;
 }
 
+interface Props {
+  post: MediumPost;
+  lang: string;
+}
+
 const { post, lang } = Astro.props;
 
 const date = new Date(post.pubDate);
@@ -32,7 +37,7 @@ const date = new Date(post.pubDate);
   {post.contentSnippet && <p class="text-slate-600 mb-4">{post.contentSnippet}</p>}
   
   <div class="flex flex-wrap gap-2 mb-4">
-    {post.categories.map((tag) => (
+    {post.categories.map((tag: string) => (
       <span
         class="px-2 py-1 bg-orange-100 text-orange-700 rounded text-sm"
       >

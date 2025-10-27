@@ -6,7 +6,7 @@
     type="search"
     id="search-box"
     placeholder="Search posts..."
-    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
   />
   <div id="search-results" class="hidden mt-2 space-y-2"></div>
 </div>
@@ -22,8 +22,8 @@
       const indexData = await response.json();
       posts = indexData.posts || [];
       
-      if (typeof window !== 'undefined' && window.lunr) {
-        idx = window.lunr.Index.load(indexData.index);
+      if (typeof window !== 'undefined' && (window as any).lunr) {
+        idx = (window as any).lunr.Index.load(indexData.index);
       }
     } catch (error) {
       console.error('Failed to load search index:', error);
@@ -67,7 +67,7 @@
         if (!resultsDiv) return;
         
         if (results.length === 0) {
-          resultsDiv.innerHTML = '<p class="text-gray-500 dark:text-gray-400">No results found.</p>';
+          resultsDiv.innerHTML = '<p class="text-gray-500">No results found.</p>';
           resultsDiv.classList.remove('hidden');
           return;
         }
@@ -75,7 +75,7 @@
         resultsDiv.innerHTML = results.map((post: any) => `
           <a href="/${post.lang}/blog/${post.slug}" class="block p-3 border border-gray-200 dark:border-gray-800 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">
             <h3 class="font-semibold">${post.title}</h3>
-            ${post.description ? `<p class="text-sm text-gray-600 dark:text-gray-400 mt-1">${post.description}</p>` : ''}
+            ${post.description ? `<p class="text-sm text-gray-600 mt-1">${post.description}</p>` : ''}
           </a>
         `).join('');
         

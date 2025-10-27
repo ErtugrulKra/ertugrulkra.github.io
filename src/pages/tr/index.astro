@@ -35,7 +35,7 @@ const allPosts = [
     author: p.data.author || 'Ertugrul Kara',
     lang: 'tr',
   })),
-  ...mediumPosts.map(m => ({
+  ...mediumPosts.map((m: any) => ({
     type: 'medium',
     title: m.title,
     link: m.link,
