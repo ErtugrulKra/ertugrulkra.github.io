@@ -20,7 +20,7 @@ const { title, pubDate, description, tags = [] } = post;
   class="border border-gray-300 rounded-lg p-6 hover:shadow-lg transition-shadow bg-slate-50 shadow-sm"
 >
   <h2 class="text-xl font-bold mb-2">
-    <a href={`/blog/${slug}/`} class="text-slate-700 hover:text-slate-900">{title}</a>
+    <a href={`/blog/${slug}`} class="text-slate-700 hover:text-slate-900">{title}</a>
   </h2>
   
   {description && <p class="text-slate-600 mb-4">{description}</p>}
@@ -44,7 +44,7 @@ const { title, pubDate, description, tags = [] } = post;
         day: 'numeric',
       })}
     </time>
-    <a href={`/blog/${slug}/`} class="text-slate-600 hover:text-slate-800 hover:underline">
+    <a href={`/blog/${slug}`} class="text-slate-600 hover:text-slate-800 hover:underline">
       Read more →
     </a>
   </div>
