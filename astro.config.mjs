@@ -7,7 +7,7 @@ export default defineConfig({
   prerender: true,
   site: 'https://ertugrulkra.github.io',
   base: '/',
-  trailingSlash: 'always',
+  trailingSlash: 'never',
   integrations: [tailwind()],
   build: {
     assets: 'assets',
