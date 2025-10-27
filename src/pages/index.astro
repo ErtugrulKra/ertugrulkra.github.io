@@ -1,5 +1,7 @@
 ---
-import { redirect } from 'astro:redirect';
+import type { APIRoute } from 'astro';
 
-redirect('/en/', 308);
+export const GET: APIRoute = ({ redirect }) => {
+  return redirect('/en/', 301);
+};
 ---
