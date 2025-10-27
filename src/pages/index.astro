@@ -1,9 +1,5 @@
 ---
-// Redirect to default language
+import { redirect } from 'astro:redirect';
 
+redirect('/en/', 308);
 ---
-
-<script>
-  window.location.replace('/en/');
-</script>
-
