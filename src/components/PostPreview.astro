@@ -6,7 +6,8 @@ interface Props {
   type?: 'local' | 'external';
 }
 
-const { url, title, description, type = 'local' } = Astro.props;
+// Props are used in the script section, not in the template
+const _ = Astro.props;
 ---
 
 <div 
@@ -46,7 +47,6 @@ const { url, title, description, type = 'local' } = Astro.props;
 <script>
   let hoverTimeout: ReturnType<typeof setTimeout> | null = null;
   let previewElement: HTMLElement | null = null;
-  let currentCard: HTMLElement | null = null;
   let isPreviewHovered = false;
 
   function showPreview(card: HTMLElement, url: string, title: string, description: string, type: string) {
@@ -62,13 +62,13 @@ const { url, title, description, type = 'local' } = Astro.props;
       if (!previewElement) return;
 
       // Update preview content
-      const titleEl = previewElement.querySelector('#preview-title');
-      const descEl = previewElement.querySelector('#preview-description');
-      const iframeContainer = previewElement.querySelector('#preview-iframe-container');
-      const iframeEl = previewElement.querySelector('#preview-iframe');
-      const externalContainer = previewElement.querySelector('#preview-external');
-      const externalDesc = previewElement.querySelector('#preview-external-desc');
-      const linkEl = previewElement.querySelector('#preview-link');
+      const titleEl = previewElement.querySelector('#preview-title') as HTMLElement | null;
+      const descEl = previewElement.querySelector('#preview-description') as HTMLElement | null;
+      const iframeContainer = previewElement.querySelector('#preview-iframe-container') as HTMLElement | null;
+      const iframeEl = previewElement.querySelector('#preview-iframe') as HTMLIFrameElement | null;
+      const externalContainer = previewElement.querySelector('#preview-external') as HTMLElement | null;
+      const externalDesc = previewElement.querySelector('#preview-external-desc') as HTMLElement | null;
+      const linkEl = previewElement.querySelector('#preview-link') as HTMLAnchorElement | null;
 
       if (titleEl) titleEl.textContent = title;
       
@@ -126,7 +126,6 @@ const { url, title, description, type = 'local' } = Astro.props;
       previewElement.classList.add('hidden');
       previewElement.classList.remove('block');
     }
-    currentCard = null;
   }
 
   // Initialize preview for all post cards
@@ -143,7 +142,6 @@ const { url, title, description, type = 'local' } = Astro.props;
       const type = cardEl.dataset.type || 'local';
 
       cardEl.addEventListener('mouseenter', () => {
-        currentCard = cardEl;
         isPreviewHovered = false;
         showPreview(cardEl, url, title, description, type);
       });
