@@ -6,8 +6,10 @@ interface Props {
   type?: 'local' | 'external';
 }
 
-// Props are used in the script section, not in the template
-const _ = Astro.props;
+const { title, description = '' } = Astro.props;
+// url and type are used in script section only
+const _url = Astro.props.url;
+const _type = Astro.props.type;
 ---
 
 <div 
