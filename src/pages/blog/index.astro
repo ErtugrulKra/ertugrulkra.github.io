@@ -2,6 +2,8 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import PostCard from '@components/PostCard.astro';
 import MediumPostCard from '@components/MediumPostCard.astro';
+import Sidebar from '@components/Sidebar.astro';
+import Footer from '@components/Footer.astro';
 import { getCollection } from 'astro:content';
 import fs from 'fs';
 import path from 'path';
@@ -58,43 +60,52 @@ const sortedPosts = allPosts.sort((a, b) => b.pubDate.getTime() - a.pubDate.getT
   lang="en"
   currentPath="/blog"
 >
-  <div class="container mx-auto px-4 py-16">
-    <header class="mb-12">
-      <h1 class="text-4xl font-bold mb-4">Blog</h1>
-      <p class="text-xl text-slate-600">
-        Thoughts on software development, technology, and more
-      </p>
-    </header>
+  <div class="flex">
+    <!-- Sidebar -->
+    <Sidebar currentPath="/blog" lang="en" />
 
-    <div class="grid md:grid-cols-2 gap-8">
-      {sortedPosts.map((post) => {
-        if (post.type === 'local') {
-          return (
-            <PostCard 
-              post={{
-                title: post.title,
-                pubDate: post.pubDate,
-                description: post.description,
-                tags: post.tags,
-                author: post.author,
-                lang: post.lang,
-              }} 
-              slug={post.slug} 
-              lang="en" 
-            />
-          );
-        } else {
-          return (
-            <MediumPostCard post={post} lang="en" />
-          );
-        }
-      })}
-    </div>
+    <!-- Main Content -->
+    <main class="flex-1 lg:ml-80 bg-white min-h-screen">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
+        <header class="mb-8">
+          <h1 class="text-5xl font-bold mb-3 text-gray-800">Blog</h1>
+          <p class="text-xl text-gray-600">
+            Thoughts on software development, technology, and more
+          </p>
+        </header>
 
-    {sortedPosts.length === 0 && (
-      <p class="text-center text-slate-500 mt-12">
-        No posts yet. Check back soon!
-      </p>
-    )}
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {sortedPosts.map((post) => {
+            if (post.type === 'local') {
+              return (
+                <PostCard 
+                  post={{
+                    title: post.title,
+                    pubDate: post.pubDate,
+                    description: post.description,
+                    tags: post.tags,
+                    author: post.author,
+                    lang: post.lang,
+                  }} 
+                  slug={post.slug} 
+                  lang="en" 
+                />
+              );
+            } else {
+              return (
+                <MediumPostCard post={post} lang="en" />
+              );
+            }
+          })}
+        </div>
+
+        {sortedPosts.length === 0 && (
+          <p class="text-center text-gray-500 mt-12">
+            No posts yet. Check back soon!
+          </p>
+        )}
+      </div>
+      <Footer />
+    </main>
   </div>
 </BaseLayout>

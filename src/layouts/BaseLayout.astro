@@ -1,6 +1,5 @@
 ---
-import Header from '@components/Header.astro';
-import Footer from '@components/Footer.astro';
+import PostPreview from '@components/PostPreview.astro';
 
 interface Props {
   title: string;
@@ -63,12 +62,9 @@ const ogImage = image || new URL('/og-image.png', Astro.site).href;
     <!-- Lunr.js for search -->
     <script src="https://unpkg.com/lunr@2.3.9/lunr.min.js"></script>
   </head>
-  <body class="font-sans bg-slate-50">
-    <Header currentLang={lang} currentPath={currentPath} />
-    <main>
-      <slot />
-    </main>
-    <Footer />
+  <body class="font-sans">
+    <slot />
+    <PostPreview url="" title="" description="" type="local" />
   </body>
 </html>
 

@@ -2,6 +2,8 @@
 import BaseLayout from '@layouts/BaseLayout.astro';
 import PostCard from '@components/PostCard.astro';
 import MediumPostCard from '@components/MediumPostCard.astro';
+import Sidebar from '@components/Sidebar.astro';
+import Footer from '@components/Footer.astro';
 import { getCollection } from 'astro:content';
 import fs from 'fs';
 import path from 'path';
@@ -62,66 +64,150 @@ const totalPosts = allPosts.length;
   lang="en"
   currentPath="/"
 >
-  <div class="container mx-auto px-4 py-16">
-    <section class="mb-16">
-      <h1 class="text-5xl font-bold mb-4">
-        Hi, I'm <span class="text-slate-700">Ertugrul Kara</span>
-      </h1>
-      <p class="text-xl text-slate-600 mb-8">
-        Software engineer and team manager passionate about microservices, cloud computing, and building enterprise solutions that make a difference.
-      </p>
-      <div class="flex gap-4">
-        <a
-          href="/blog"
-          class="px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors"
-        >
-          View Blog
-        </a>
-        <a
-          href="/about"
-          class="px-6 py-3 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-        >
-          About Me
-        </a>
-      </div>
-    </section>
+  <div class="flex">
+    <!-- Sidebar -->
+    <Sidebar currentPath="/" lang="en" />
 
-    <section>
-      <h2 class="text-3xl font-bold mb-8">Recent Posts</h2>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {recentPosts.map((post) => {
-          if (post.type === 'local') {
-            return (
-              <PostCard 
-                post={{
-                  title: post.title,
-                  pubDate: post.pubDate,
-                  description: post.description,
-                  tags: post.tags,
-                  author: post.author,
-                  lang: post.lang,
-                }} 
-                slug={post.slug} 
-                lang="en" 
-              />
-            );
-          } else {
-            return (
-              <MediumPostCard post={post} lang="en" />
-            );
-          }
-        })}
+    <!-- Main Content -->
+    <main class="flex-1 lg:ml-80 bg-white min-h-screen">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
+        <!-- Header Section -->
+        <section class="mb-12">
+          <h1 class="text-5xl font-bold mb-3 text-gray-800">
+            Ertugrul Kara
+          </h1>
+          <p class="text-2xl text-gray-600 mb-4">
+            Senior Software Engineer
+          </p>
+          <div class="grid md:grid-cols-2 gap-6 mb-6">
+            <p class="text-gray-700 leading-relaxed">
+              A software architect who enjoys designing scalable software systems and working with engineering teams. 
+              Passionate about cloud-based e-Invoice and e-Signature systems, distributed applications, and microservice frameworks.
+            </p>
+            <p class="text-gray-700 leading-relaxed">
+              Enthusiastic about learning modern technologies, improving development processes, and connecting technical solutions with business goals. 
+              Experienced in Agile team management, DevOps practices, and delivering software solutions for different industries.
+            </p>
+          </div>
+          <div class="flex gap-4">
+            <a
+              href="/blog"
+              class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex items-center gap-2"
+            >
+              <span>View Portfolio</span>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </a>
+            <a
+              href="/about"
+              class="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium flex items-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <span>View Resume</span>
+            </a>
+          </div>
+        </section>
+
+        <!-- What I Do Section -->
+        <section class="mb-12">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-1 h-10 bg-blue-600"></div>
+            <h2 class="text-3xl font-bold text-gray-800">What I Do</h2>
+          </div>
+          <p class="text-gray-700 leading-relaxed mb-6">
+            With over 18 years of experience in software development, I specialize in designing and building scalable, high-performance applications and distributed systems. 
+            My expertise spans across software architecture, cloud-based e-Invoice and e-Signature systems, microservice frameworks, team leadership, and DevOps practices. 
+            Check out my online resume and project portfolio for more details about my technical skills and professional experience.
+          </p>
+
+          <!-- Technology Cards -->
+          <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-lg transition-all">
+              <div class="text-3xl mb-2">C#</div>
+              <h3 class="font-bold text-gray-800 mb-1 text-sm">C# .NET</h3>
+              <p class="text-xs text-gray-600">Enterprise applications</p>
+            </div>
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-lg transition-all">
+              <div class="text-3xl mb-2">🐍</div>
+              <h3 class="font-bold text-gray-800 mb-1 text-sm">Python FastAPI</h3>
+              <p class="text-xs text-gray-600">Modern API development</p>
+            </div>
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-lg transition-all">
+              <div class="text-3xl mb-2">📦</div>
+              <h3 class="font-bold text-gray-800 mb-1 text-sm">DevOps</h3>
+              <p class="text-xs text-gray-600">CI/CD & Automation</p>
+            </div>
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-lg transition-all">
+              <div class="text-3xl mb-2">☁️</div>
+              <h3 class="font-bold text-gray-800 mb-1 text-sm">Cloud</h3>
+              <p class="text-xs text-gray-600">AWS & Azure</p>
+            </div>
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-lg transition-all">
+              <div class="text-3xl mb-2">⚡</div>
+              <h3 class="font-bold text-gray-800 mb-1 text-sm">Microservices</h3>
+              <p class="text-xs text-gray-600">Distributed systems</p>
+            </div>
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-lg transition-all">
+              <div class="text-3xl mb-2">🔧</div>
+              <h3 class="font-bold text-gray-800 mb-1 text-sm">Code Refactoring</h3>
+              <p class="text-xs text-gray-600">Code quality & optimization</p>
+            </div>
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-lg transition-all">
+              <div class="text-3xl mb-2">🌐</div>
+              <h3 class="font-bold text-gray-800 mb-1 text-sm">ASP.NET</h3>
+              <p class="text-xs text-gray-600">Web applications</p>
+            </div>
+            <div class="bg-white border-2 border-gray-200 rounded-lg p-4 hover:border-blue-500 hover:shadow-lg transition-all">
+              <div class="text-3xl mb-2">🤖</div>
+              <h3 class="font-bold text-gray-800 mb-1 text-sm">AI - LLM - ML</h3>
+              <p class="text-xs text-gray-600">Machine Learning</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Recent Posts Section -->
+        <section>
+          <h2 class="text-3xl font-bold mb-6 text-gray-800">Recent Posts</h2>
+          <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {recentPosts.map((post) => {
+              if (post.type === 'local') {
+                return (
+                  <PostCard 
+                    post={{
+                      title: post.title,
+                      pubDate: post.pubDate,
+                      description: post.description,
+                      tags: post.tags,
+                      author: post.author,
+                      lang: post.lang,
+                    }} 
+                    slug={post.slug} 
+                    lang="en" 
+                  />
+                );
+              } else {
+                return (
+                  <MediumPostCard post={post} lang="en" />
+                );
+              }
+            })}
+          </div>
+          {totalPosts > 6 && (
+            <div class="text-center mt-8">
+              <a
+                href="/blog"
+                class="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+              >
+                View All Posts
+              </a>
+            </div>
+          )}
+        </section>
       </div>
-      {totalPosts > 6 && (
-        <div class="text-center mt-8">
-          <a
-            href="/blog"
-            class="inline-block px-6 py-3 bg-slate-700 text-white rounded-lg hover:bg-slate-800 transition-colors"
-          >
-            View All Posts
-          </a>
-        </div>
-      )}
-    </section>
+      <Footer />
+    </main>
   </div>
 </BaseLayout>
