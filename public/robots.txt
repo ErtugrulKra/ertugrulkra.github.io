@@ -1,5 +1,5 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://ertugrulkara.com/sitemap.xml
+Sitemap: https://blog.ertugrulkara.com/sitemap.xml
 

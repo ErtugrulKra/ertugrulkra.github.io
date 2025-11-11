@@ -21,6 +21,12 @@ const { Content } = await post.render();
   description={post.data.description || post.data.title}
   lang="tr"
   currentPath={`/tr/blog/${post.slug}`}
+  type="article"
+  publishedTime={post.data.pubDate.toISOString()}
+  modifiedTime={post.data.pubDate.toISOString()}
+  authorName={post.data.author || 'Ertugrul Kara'}
+  tags={post.data.tags || []}
+  image={post.data.image}
 >
   <div class="flex">
     <!-- Sidebar -->

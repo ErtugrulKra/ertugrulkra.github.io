@@ -5,7 +5,7 @@ import tailwind from '@astrojs/tailwind';
 export default defineConfig({
   output: 'static',
   prerender: true,
-  site: 'https://ertugrulkra.github.io',
+  site: 'https://blog.ertugrulkara.com',
   base: '/',
   trailingSlash: 'never',
   integrations: [tailwind()],
