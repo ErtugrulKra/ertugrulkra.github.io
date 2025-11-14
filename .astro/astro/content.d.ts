@@ -157,13 +157,6 @@ declare module 'astro:content' {
 } & { render(): Render[".md"] };
 };
 "en-posts": {
-"Token-Oriented-Object-Notation--A-More-Efficient-Data-Format-for-LLMs.md": {
-	id: "Token-Oriented-Object-Notation--A-More-Efficient-Data-Format-for-LLMs.md";
-  slug: "token-oriented-object-notation--a-more-efficient-data-format-for-llms";
-  body: string;
-  collection: "en-posts";
-  data: InferEntrySchema<"en-posts">
-} & { render(): Render[".md"] };
 "welcome-to-my-blog.md": {
 	id: "welcome-to-my-blog.md";
   slug: "welcome-to-my-blog";
