@@ -157,6 +157,13 @@ declare module 'astro:content' {
 } & { render(): Render[".md"] };
 };
 "en-posts": {
+"Token-Oriented-Object-Notation--A-More-Efficient-Data-Format-for-LLMs.md": {
+	id: "Token-Oriented-Object-Notation--A-More-Efficient-Data-Format-for-LLMs.md";
+  slug: "token-oriented-object-notation--a-more-efficient-data-format-for-llms";
+  body: string;
+  collection: "en-posts";
+  data: InferEntrySchema<"en-posts">
+} & { render(): Render[".md"] };
 "welcome-to-my-blog.md": {
 	id: "welcome-to-my-blog.md";
   slug: "welcome-to-my-blog";
@@ -165,24 +172,14 @@ declare module 'astro:content' {
   data: InferEntrySchema<"en-posts">
 } & { render(): Render[".md"] };
 };
-"tr": {
-"posts/hoş-geldiniz.md": {
-	id: "posts/hoş-geldiniz.md";
-  slug: "posts/hoş-geldiniz";
-  body: string;
-  collection: "tr";
-  data: any
-} & { render(): Render[".md"] };
-};
-"tr-posts": {
-"hoş-geldiniz.md": {
-	id: "hoş-geldiniz.md";
-  slug: "hoş-geldiniz";
+"tr-posts": Record<string, {
+  id: string;
+  slug: string;
   body: string;
   collection: "tr-posts";
-  data: InferEntrySchema<"tr-posts">
-} & { render(): Render[".md"] };
-};
+  data: InferEntrySchema<"tr-posts">;
+  render(): Render[".md"];
+}>;
 
 	};
 
