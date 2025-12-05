@@ -44,11 +44,18 @@ const xDefault =
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+    <meta name="googlebot" content="index, follow" />
+    <meta name="author" content={authorName} />
+    <meta name="language" content={lang} />
     
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="format-detection" content="telephone=no" />
     
     <!-- Open Graph -->
     <meta property="og:title" content={title} />
@@ -56,6 +63,16 @@ const xDefault =
     <meta property="og:type" content={type} />
     <meta property="og:url" content={canonical} />
     <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:site_name" content="Ertugrul Kara" />
+    <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'tr_TR'} />
+    {lang === 'tr' && (
+      <meta property="og:locale:alternate" content="en_US" />
+    )}
+    {lang === 'en' && (
+      <meta property="og:locale:alternate" content="tr_TR" />
+    )}
     {type === 'article' && publishedTime && (
       <meta property="article:published_time" content={publishedTime} />
     )}
@@ -106,7 +123,17 @@ const xDefault =
         '@context': 'https://schema.org',
         '@type': 'WebSite',
         name: 'Ertugrul Kara',
-        url: new URL('/', Astro.site).href
+        url: new URL('/', Astro.site).href,
+        description: 'Personal website and blog of Ertugrul Kara - Software Engineer, Architect',
+        inLanguage: lang,
+        potentialAction: {
+          '@type': 'SearchAction',
+          target: {
+            '@type': 'EntryPoint',
+            urlTemplate: new URL('/search?q={search_term_string}', Astro.site).href
+          },
+          'query-input': 'required name=search_term_string'
+        }
       })}
     </script>
 
@@ -117,10 +144,15 @@ const xDefault =
         '@type': 'Person',
         name: 'Ertugrul Kara',
         url: new URL('/', Astro.site).href,
+        jobTitle: 'Software Engineer, Architect',
+        description: 'Software architect who enjoys designing scalable software systems and working with engineering teams.',
         sameAs: [
           'https://github.com/ertugrulkra',
+          'https://www.linkedin.com/in/ertugrul-kra/',
           'https://medium.com/@ertugrulkra'
-        ]
+        ],
+        email: 'hello@ertugrulkara.com',
+        image: new URL('/avatar.jpg', Astro.site).href
       })}
     </script>
 
@@ -134,7 +166,13 @@ const xDefault =
           image: [ogImage],
           author: {
             '@type': 'Person',
-            name: authorName
+            name: authorName,
+            url: new URL('/', Astro.site).href
+          },
+          publisher: {
+            '@type': 'Person',
+            name: authorName,
+            url: new URL('/', Astro.site).href
           },
           datePublished: publishedTime || undefined,
           dateModified: modifiedTime || publishedTime || undefined,
@@ -142,7 +180,8 @@ const xDefault =
           mainEntityOfPage: {
             '@type': 'WebPage',
             '@id': canonical.href
-          }
+          },
+          keywords: tags.length > 0 ? tags.join(', ') : undefined
         })}
       </script>
     )}

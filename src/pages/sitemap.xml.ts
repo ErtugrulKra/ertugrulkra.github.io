@@ -13,48 +13,70 @@ export const GET: APIRoute = async ({ site }) => {
     <loc>${baseUrl}/en</loc>
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en" />
     <xhtml:link rel="alternate" hreflang="tr" href="${baseUrl}/tr" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en" />
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>${baseUrl}/tr</loc>
     <xhtml:link rel="alternate" hreflang="tr" href="${baseUrl}/tr" />
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en" />
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>${baseUrl}/en/about</loc>
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en/about" />
     <xhtml:link rel="alternate" hreflang="tr" href="${baseUrl}/tr/about" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en/about" />
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>${baseUrl}/tr/about</loc>
     <xhtml:link rel="alternate" hreflang="tr" href="${baseUrl}/tr/about" />
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en/about" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en/about" />
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>${baseUrl}/en/blog</loc>
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en/blog" />
     <xhtml:link rel="alternate" hreflang="tr" href="${baseUrl}/tr/blog" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en/blog" />
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>${baseUrl}/tr/blog</loc>
     <xhtml:link rel="alternate" hreflang="tr" href="${baseUrl}/tr/blog" />
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en/blog" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en/blog" />
+    <lastmod>${new Date().toISOString()}</lastmod>
+    <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   ${enPosts.map(post => `<url>
     <loc>${baseUrl}/en/blog/${post.slug}</loc>
     <lastmod>${post.data.pubDate.toISOString()}</lastmod>
     <xhtml:link rel="alternate" hreflang="en" href="${baseUrl}/en/blog/${post.slug}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en/blog/${post.slug}" />
+    <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`).join('\n  ')}
   ${trPosts.map(post => `<url>
     <loc>${baseUrl}/tr/blog/${post.slug}</loc>
     <lastmod>${post.data.pubDate.toISOString()}</lastmod>
     <xhtml:link rel="alternate" hreflang="tr" href="${baseUrl}/tr/blog/${post.slug}" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="${baseUrl}/en/blog/${post.slug}" />
+    <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>`).join('\n  ')}
 </urlset>`;
