@@ -1,12 +1,13 @@
 ---
 const plausibleDomain = import.meta.env.PUBLIC_PLAUSIBLE_DOMAIN as string | undefined;
-const umamiSrc = import.meta.env.PUBLIC_UMAMI_SRC as string | undefined;
-const umamiId = import.meta.env.PUBLIC_UMAMI_WEBSITE_ID as string | undefined;
 ---
 
 {plausibleDomain && (
   <script is:inline defer data-domain={plausibleDomain} src="https://plausible.io/js/script.js"></script>
 )}
-{umamiSrc && umamiId && (
-  <script is:inline async src={umamiSrc} data-website-id={umamiId}></script>
-)}
+<script
+  is:inline
+  defer
+  src="https://cloud.umami.is/script.js"
+  data-website-id="ab0cf6ae-7a5d-4133-a4fc-d2228886a81e"
+></script>
