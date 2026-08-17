@@ -1,0 +1,38 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageShell from '@components/PageShell.astro';
+import { getCombinedPosts, groupPostsByYear } from '../../../lib/posts';
+import { localePath, t } from '../../../lib/i18n';
+
+const groups = groupPostsByYear(await getCombinedPosts('tr'));
+---
+
+<BaseLayout
+  title={`${t('tr', 'archiveTitle')} - Ertugrul Kara`}
+  description="Yazılar yıla göre gruplandı."
+  lang="tr"
+  currentPath="/tr/blog/archive"
+>
+  <PageShell lang="tr" currentPath="/tr/blog/archive" maxWidth="4xl">
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-3 text-gray-800 dark:text-slate-100">{t('tr', 'archiveTitle')}</h1>
+    </header>
+    {groups.map(({ year, posts }) => (
+      <section class="mb-10">
+        <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-slate-100">{year}</h2>
+        <ul class="space-y-2">
+          {posts.map((post) => (
+            <li class="flex flex-wrap items-baseline gap-3">
+              <time class="text-sm text-gray-500 dark:text-slate-400 w-28" datetime={post.pubDate.toISOString()}>
+                {post.pubDate.toLocaleDateString('tr-TR', { month: 'short', day: 'numeric' })}
+              </time>
+              <a href={localePath('tr', `/blog/${post.slug}`)} class="text-blue-700 dark:text-blue-300 hover:underline">
+                {post.title}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ))}
+  </PageShell>
+</BaseLayout>

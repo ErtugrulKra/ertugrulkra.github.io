@@ -1,0 +1,25 @@
+---
+import Sidebar from './Sidebar.astro';
+import Footer from './Footer.astro';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  lang?: Lang;
+  currentPath?: string;
+  maxWidth?: '7xl' | '4xl' | '3xl';
+}
+
+const { lang = 'en', currentPath = '/', maxWidth = '7xl' } = Astro.props;
+const widthClass =
+  maxWidth === '3xl' ? 'max-w-3xl' : maxWidth === '4xl' ? 'max-w-4xl' : 'max-w-7xl';
+---
+
+<div class="flex">
+  <Sidebar currentPath={currentPath} lang={lang} />
+  <main id="main-content" class="flex-1 lg:ml-80 bg-white dark:bg-slate-900 min-h-screen">
+    <div class:list={[widthClass, 'mx-auto px-4 sm:px-6 py-6 lg:py-8']}>
+      <slot />
+    </div>
+    <Footer lang={lang} />
+  </main>
+</div>

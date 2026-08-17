@@ -140,23 +140,7 @@ declare module 'astro:content' {
 	>;
 
 	type ContentEntryMap = {
-		"en": {
-"posts/getting-started-with-astro.md": {
-	id: "posts/getting-started-with-astro.md";
-  slug: "posts/getting-started-with-astro";
-  body: string;
-  collection: "en";
-  data: any
-} & { render(): Render[".md"] };
-"posts/welcome-to-my-blog.md": {
-	id: "posts/welcome-to-my-blog.md";
-  slug: "posts/welcome-to-my-blog";
-  body: string;
-  collection: "en";
-  data: any
-} & { render(): Render[".md"] };
-};
-"en-posts": {
+		"en-posts": {
 "welcome-to-my-blog.md": {
 	id: "welcome-to-my-blog.md";
   slug: "welcome-to-my-blog";

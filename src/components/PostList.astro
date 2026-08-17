@@ -1,0 +1,46 @@
+---
+import PostCard from './PostCard.astro';
+import MediumPostCard from './MediumPostCard.astro';
+import type { CombinedPost } from '../lib/posts';
+import type { Lang } from '../lib/i18n';
+
+interface Props {
+  posts: CombinedPost[];
+  lang: Lang;
+}
+
+const { posts, lang } = Astro.props;
+---
+
+<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4 items-stretch">
+  {posts.map((post) =>
+    post.type === 'local' ? (
+      <PostCard
+        post={{
+          title: post.title,
+          pubDate: post.pubDate,
+          description: post.description,
+          tags: post.tags,
+          author: post.author,
+          lang: post.lang,
+          readingMinutes: post.readingMinutes,
+        }}
+        slug={post.slug}
+        lang={lang}
+      />
+    ) : (
+      <MediumPostCard
+        post={{
+          title: post.title,
+          slug: post.slug,
+          pubDate: post.pubDate,
+          description: post.description,
+          tags: post.tags,
+          author: post.author,
+          readingMinutes: post.readingMinutes,
+        }}
+        lang={lang}
+      />
+    )
+  )}
+</div>

@@ -7,13 +7,58 @@ html {
 }
 
 body {
-  @apply bg-white text-gray-800;
+  @apply bg-white text-gray-800 dark:bg-slate-900 dark:text-slate-100;
   min-height: 100vh;
 }
 
-@layer base {
-  a {
-    @apply text-blue-600 hover:text-blue-700 transition-colors;
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 
+.post-content h2 {
+  @apply text-3xl font-bold mt-12 mb-4 text-blue-700 dark:text-blue-300;
+}
+
+.post-content h3 {
+  @apply text-2xl font-bold mt-8 mb-3 text-cyan-600 dark:text-cyan-300;
+}
+
+.post-content p {
+  @apply mb-4 leading-relaxed text-gray-700 dark:text-slate-300;
+}
+
+.post-content a {
+  @apply text-blue-600 dark:text-blue-400 hover:text-cyan-600 underline transition-colors;
+}
+
+.post-content :not(pre) > code {
+  @apply bg-blue-100 dark:bg-slate-700 text-blue-800 dark:text-blue-200 px-1 py-0.5 rounded text-sm font-mono;
+}
+
+.post-content pre {
+  @apply bg-gradient-to-r from-blue-50 to-cyan-50 dark:from-slate-800 dark:to-slate-800 border-2 border-blue-200 dark:border-slate-600 p-4 pt-10 rounded-lg overflow-x-auto mb-4;
+}
+
+.post-content ul,
+.post-content ol {
+  @apply mb-4 pl-6;
+}
+
+.post-content ul {
+  @apply list-disc;
+}
+
+.post-content ol {
+  @apply list-decimal;
+}
+
+.post-content blockquote {
+  @apply border-l-4 border-blue-400 pl-4 italic text-slate-700 dark:text-slate-300 my-4 bg-slate-50 dark:bg-slate-800 py-2 rounded-r;
+}

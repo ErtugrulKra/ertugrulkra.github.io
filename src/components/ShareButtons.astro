@@ -1,0 +1,63 @@
+---
+import { t, type Lang } from '../lib/i18n';
+
+interface Props {
+  lang: Lang;
+  title: string;
+  url: string;
+}
+
+const { lang, title, url } = Astro.props;
+const encodedUrl = encodeURIComponent(url);
+const encodedTitle = encodeURIComponent(title);
+const linkedIn = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`;
+const xShare = `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedTitle}`;
+---
+
+<div class="flex flex-wrap items-center gap-3 mt-8">
+  <p class="text-sm font-medium text-gray-700 dark:text-slate-200">{t(lang, 'share')}</p>
+  <a
+    href={linkedIn}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-800"
+  >
+    LinkedIn
+  </a>
+  <a
+    href={xShare}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-800"
+  >
+    X
+  </a>
+  <button
+    type="button"
+    class="copy-link-btn px-3 py-1.5 text-sm rounded-lg border border-gray-300 dark:border-slate-600 hover:bg-gray-100 dark:hover:bg-slate-800"
+    data-url={url}
+    data-copied={t(lang, 'copied')}
+  >
+    {t(lang, 'copyLink')}
+  </button>
+</div>
+
+<script>
+  document.querySelectorAll('.copy-link-btn').forEach((node) => {
+    node.addEventListener('click', async () => {
+      const button = node as HTMLButtonElement;
+      const url = button.dataset.url || window.location.href;
+      const copied = button.dataset.copied || 'Copied';
+      try {
+        await navigator.clipboard.writeText(url);
+        const original = button.textContent;
+        button.textContent = copied;
+        setTimeout(() => {
+          button.textContent = original;
+        }, 1600);
+      } catch {
+        // ignore
+      }
+    });
+  });
+</script>

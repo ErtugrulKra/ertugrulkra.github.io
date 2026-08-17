@@ -1,11 +1,29 @@
 ---
+import { localePath, t, type Lang } from '../lib/i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const year = new Date().getFullYear();
+const rssHref = lang === 'tr' ? '/tr/rss.xml' : '/rss.xml';
 ---
 
-<footer class="border-t border-gray-200 bg-gray-50 py-6 mt-16">
-  <div class="max-w-4xl mx-auto px-8">
-    <p class="text-gray-600 text-center text-sm">
-      © {new Date().getFullYear()} Ertugrul Kara. All rights reserved.
-    </p>
+<footer class="border-t border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-800 py-6 mt-16">
+  <div class="max-w-4xl mx-auto px-8 flex flex-col gap-4">
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+      <p class="text-gray-600 dark:text-slate-300 text-center text-sm">
+        © {year} Ertugrul Kara. {t(lang, 'allRights')}
+      </p>
+      <nav class="flex flex-wrap items-center justify-center gap-4 text-sm" aria-label="Footer">
+        <a href={localePath(lang, '/blog')} class="text-blue-600 dark:text-blue-400 hover:underline font-medium">{t(lang, 'blog')}</a>
+        <a href={localePath(lang, '/tags')} class="text-gray-600 dark:text-slate-300 hover:text-blue-600 hover:underline">{t(lang, 'tags')}</a>
+        <a href={localePath(lang, '/blog/archive')} class="text-gray-600 dark:text-slate-300 hover:text-blue-600 hover:underline">{t(lang, 'archive')}</a>
+        <a href={localePath(lang, '/search')} class="text-gray-600 dark:text-slate-300 hover:text-blue-600 hover:underline">{t(lang, 'search')}</a>
+        <a href={rssHref} class="text-gray-600 dark:text-slate-300 hover:text-blue-600 hover:underline">{t(lang, 'rss')}</a>
+        <a href="https://medium.com/@ertugrulkra" target="_blank" rel="noopener noreferrer" class="text-gray-600 dark:text-slate-300 hover:text-blue-600 hover:underline">Medium</a>
+      </nav>
+    </div>
   </div>
 </footer>
-

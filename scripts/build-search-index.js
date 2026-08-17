@@ -19,33 +19,37 @@ async function buildSearchIndex() {
     
     // Read EN posts
     if (fs.existsSync(enPostsDir)) {
-      const enFiles = fs.readdirSync(enPostsDir).filter(f => f.endsWith('.md'));
+      const enFiles = fs.readdirSync(enPostsDir).filter(f => f.endsWith('.md') && !f.startsWith('_'));
       posts.push(...enFiles.map(file => {
         const filePath = path.join(enPostsDir, file);
         const content = fs.readFileSync(filePath, 'utf-8');
         const slug = path.basename(file, '.md');
         const frontmatter = extractFrontmatter(content);
+        if (frontmatter.draft === true || frontmatter.draft === 'true') return null;
         return {
+          id: `en:${slug}`,
           slug,
           title: frontmatter.title || '',
           description: frontmatter.description || '',
-          content: removeFrontmatter(content).substring(0, 500), // Limit content for indexing
+          content: removeFrontmatter(content).substring(0, 500),
           tags: frontmatter.tags || [],
           lang: 'en',
           date: frontmatter.pubDate || new Date().toISOString(),
         };
-      }));
+      }).filter(Boolean));
     }
     
     // Read TR posts
     if (fs.existsSync(trPostsDir)) {
-      const trFiles = fs.readdirSync(trPostsDir).filter(f => f.endsWith('.md'));
+      const trFiles = fs.readdirSync(trPostsDir).filter(f => f.endsWith('.md') && !f.startsWith('_'));
       posts.push(...trFiles.map(file => {
         const filePath = path.join(trPostsDir, file);
         const content = fs.readFileSync(filePath, 'utf-8');
         const slug = path.basename(file, '.md');
         const frontmatter = extractFrontmatter(content);
+        if (frontmatter.draft === true || frontmatter.draft === 'true') return null;
         return {
+          id: `tr:${slug}`,
           slug,
           title: frontmatter.title || '',
           description: frontmatter.description || '',
@@ -54,12 +58,54 @@ async function buildSearchIndex() {
           lang: 'tr',
           date: frontmatter.pubDate || new Date().toISOString(),
         };
-      }));
+      }).filter(Boolean));
     }
     
-    // Build Lunr index
+    // Read Medium summaries (title/slug only — full article body stays on Medium)
+    const mediumPath = path.join(postsDir, '_medium', 'posts.json');
+    if (fs.existsSync(mediumPath)) {
+      try {
+        const mediumPosts = JSON.parse(fs.readFileSync(mediumPath, 'utf-8'));
+        const summariesPath = path.join(__dirname, '../src/data/medium-summaries.json');
+        let summaries = {};
+        if (fs.existsSync(summariesPath)) {
+          try {
+            summaries = JSON.parse(fs.readFileSync(summariesPath, 'utf-8'));
+          } catch {
+            summaries = {};
+          }
+        }
+
+        for (const item of mediumPosts) {
+          const snippet = item.contentSnippet || '';
+          posts.push({
+            id: `en:${item.slug}`,
+            slug: item.slug,
+            title: item.title || '',
+            description: summaries[item.slug]?.en || snippet,
+            content: summaries[item.slug]?.en || snippet,
+            tags: item.categories || [],
+            lang: 'en',
+            date: item.pubDate || new Date().toISOString(),
+          });
+          posts.push({
+            id: `tr:${item.slug}`,
+            slug: item.slug,
+            title: item.title || '',
+            description: summaries[item.slug]?.tr || snippet,
+            content: summaries[item.slug]?.tr || snippet,
+            tags: item.categories || [],
+            lang: 'tr',
+            date: item.pubDate || new Date().toISOString(),
+          });
+        }
+      } catch (error) {
+        console.error('Could not index Medium posts:', error);
+      }
+    }
+
     const idx = lunr(function () {
-      this.ref('slug');
+      this.ref('id');
       this.field('title', { boost: 10 });
       this.field('description', { boost: 5 });
       this.field('content');
@@ -80,6 +126,7 @@ async function buildSearchIndex() {
     const output = {
       index: idx.toJSON(),
       posts: posts.map(p => ({
+        id: p.id,
         slug: p.slug,
         title: p.title,
         description: p.description,

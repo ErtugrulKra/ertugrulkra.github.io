@@ -1,0 +1,46 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageShell from '@components/PageShell.astro';
+import PostList from '@components/PostList.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
+import { getAllTags, getCombinedPosts } from '../../lib/posts';
+import { localePath, t } from '../../lib/i18n';
+
+export async function getStaticPaths() {
+  const tags = await getAllTags('en');
+  return tags.map((tag) => ({ params: { tag } }));
+}
+
+const { tag } = Astro.params;
+const posts = (await getCombinedPosts('en')).filter((post) => post.tags.includes(tag || ''));
+const currentPath = `/tags/${tag}`;
+const breadcrumbs = [
+  { name: 'Home', href: '/' },
+  { name: t('en', 'tags'), href: localePath('en', '/tags') },
+  { name: tag || '', href: currentPath },
+];
+---
+
+<BaseLayout
+  title={`Tag: ${tag} - Ertugrul Kara`}
+  description={`Articles and summaries by Ertugrul Kara tagged with ${tag}.`}
+  lang="en"
+  currentPath={currentPath}
+  breadcrumbs={breadcrumbs}
+>
+  <PageShell lang="en" currentPath={currentPath}>
+    <Breadcrumbs items={breadcrumbs} />
+    <header class="mb-12">
+      <h1 class="text-4xl font-bold mb-4 text-gray-800 dark:text-slate-100">
+        Posts tagged with <span class="text-blue-600">{tag}</span>
+      </h1>
+      <p class="text-xl text-gray-600 dark:text-slate-300">
+        {posts.length} post{posts.length !== 1 ? 's' : ''} found
+      </p>
+    </header>
+    <PostList posts={posts} lang="en" />
+    {posts.length === 0 && (
+      <p class="text-center text-gray-500 mt-12">{t('en', 'noPostsTag')}</p>
+    )}
+  </PageShell>
+</BaseLayout>

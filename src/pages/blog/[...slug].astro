@@ -1,118 +1,130 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
-import Sidebar from '@components/Sidebar.astro';
-import Footer from '@components/Footer.astro';
+import PageShell from '@components/PageShell.astro';
+import Breadcrumbs from '@components/Breadcrumbs.astro';
+import TableOfContents from '@components/TableOfContents.astro';
+import ShareButtons from '@components/ShareButtons.astro';
+import RelatedPosts from '@components/RelatedPosts.astro';
+import Comments from '@components/Comments.astro';
+import CodeEnhancer from '@components/CodeEnhancer.astro';
+import MediumSummary from '@components/MediumSummary.astro';
 import { getCollection } from 'astro:content';
+import { loadMediumPosts, uniqueSummary, type MediumPost } from '../../lib/medium';
+import { getCombinedPosts, getRelatedPosts, hasTranslatedAlternate } from '../../lib/posts';
+import { readingTimeMinutes } from '../../lib/reading';
+import { localePath, t } from '../../lib/i18n';
+import type { CollectionEntry } from 'astro:content';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('en-posts');
-  return posts.map((post) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+  const posts = (await getCollection('en-posts')).filter((post) => !post.data.draft && !post.id.startsWith('_'));
+  const medium = loadMediumPosts();
+  const localSlugs = new Set<string>(posts.map((p) => p.slug));
+
+  return [
+    ...posts.map((post) => ({
+      params: { slug: post.slug },
+      props: { kind: 'local' as const, post, mediumPost: undefined as MediumPost | undefined },
+    })),
+    ...medium
+      .filter((item) => !localSlugs.has(item.slug))
+      .map((mediumPost) => ({
+        params: { slug: mediumPost.slug },
+        props: { kind: 'medium' as const, post: undefined as CollectionEntry<'en-posts'> | undefined, mediumPost },
+      })),
+  ];
 }
 
-const { post } = Astro.props;
-const { Content } = await post.render();
+const { kind, post, mediumPost } = Astro.props;
+const rendered = kind === 'local' && post ? await post.render() : null;
+const Content = rendered?.Content ?? null;
+const headings = rendered?.headings ?? [];
+const title = kind === 'local' && post ? post.data.title : mediumPost!.title;
+const description =
+  kind === 'local' && post
+    ? post.data.description || post.data.title
+    : uniqueSummary(mediumPost!, 'en');
+const published = kind === 'local' && post ? post.data.pubDate : new Date(mediumPost!.pubDate);
+const modified = kind === 'local' && post ? (post.data.updatedDate || post.data.pubDate) : published;
+const tags = kind === 'local' && post ? post.data.tags || [] : mediumPost!.categories || [];
+const author = kind === 'local' && post ? post.data.author || 'Ertugrul Kara' : mediumPost!.author || 'Ertugrul Kara';
+const image = kind === 'local' && post ? post.data.image : undefined;
+const slug = kind === 'local' && post ? post.slug : mediumPost!.slug;
+const readingMinutes =
+  kind === 'local' && post
+    ? readingTimeMinutes(post.body || description)
+    : readingTimeMinutes(`${title} ${description}`);
+const allPosts = await getCombinedPosts('en');
+const related = getRelatedPosts(allPosts, slug, tags);
+const hasAlternate = await hasTranslatedAlternate(slug, kind);
+const currentPath = `/blog/${slug}`;
+const pageUrl = new URL(currentPath, Astro.site || 'https://blog.ertugrulkara.com').href;
+const breadcrumbs = [
+  { name: 'Home', href: '/' },
+  { name: t('en', 'blog'), href: localePath('en', '/blog') },
+  { name: title, href: currentPath },
+];
 ---
 
 <BaseLayout
-  title={`${post.data.title} - Ertugrul Kara`}
-  description={post.data.description || post.data.title}
+  title={`${title} - Ertugrul Kara`}
+  description={description}
   lang="en"
-  currentPath={`/blog/${post.slug}`}
+  currentPath={currentPath}
+  type="article"
+  publishedTime={published.toISOString()}
+  modifiedTime={modified.toISOString()}
+  authorName={author}
+  tags={tags}
+  image={image}
+  sameAs={kind === 'medium' ? mediumPost?.link : undefined}
+  headline={title}
+  hasLanguageAlternate={hasAlternate}
+  breadcrumbs={breadcrumbs}
 >
-  <div class="flex">
-    <!-- Sidebar -->
-    <Sidebar currentPath={`/blog/${post.slug}`} lang="en" />
-
-    <!-- Main Content -->
-    <main class="flex-1 lg:ml-80 bg-white min-h-screen">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 py-6 lg:py-8">
-        <article class="prose prose-lg max-w-none">
-    <header class="mb-12">
-      <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">{post.data.title}</h1>
-      
-      <div class="flex flex-wrap items-center gap-4 text-slate-600 mb-6">
-          <time datetime={post.data.pubDate.toISOString()}>
-            {post.data.pubDate.toLocaleDateString('en-US', {
-              year: 'numeric',
-              month: 'long',
-              day: 'numeric',
-            })}
-          </time>
-          
-          {post.data.author && <span>by {post.data.author}</span>}
-        </div>
-        
-        {post.data.description && (
-          <p class="text-xl text-slate-700">{post.data.description}</p>
-        )}
-        
-        {post.data.tags && post.data.tags.length > 0 && (
-          <div class="flex flex-wrap gap-2 mt-4">
-            {post.data.tags.map((tag) => (
-              <a
-                href={`/tags/${tag}`}
-                class="px-3 py-1 bg-gradient-to-r from-blue-100 to-cyan-100 text-blue-700 rounded-full text-sm hover:from-blue-200 hover:to-cyan-200 transition-all font-medium"
-              >
-                {tag}
-              </a>
-            ))}
+  <PageShell lang="en" currentPath={currentPath} maxWidth="4xl">
+    <Breadcrumbs items={breadcrumbs} />
+    {kind === 'medium' && mediumPost ? (
+      <MediumSummary post={mediumPost} lang="en" readingMinutes={readingMinutes} pageUrl={pageUrl} />
+    ) : (
+      <article>
+        <header class="mb-10">
+          <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">{title}</h1>
+          <div class="flex flex-wrap items-center gap-4 text-slate-600 dark:text-slate-300 mb-6">
+            <time datetime={published.toISOString()}>
+              {published.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
+            </time>
+            {author && <span>{t('en', 'by')} {author}</span>}
+            <span>{readingMinutes} {t('en', 'minRead')}</span>
           </div>
-        )}
-      </header>
-      
-      <div class="post-content">
-        <Content />
-      </div>
-    </article>
-      </div>
-      <Footer />
-    </main>
-  </div>
+          {kind === 'local' && post?.data.description && (
+            <p class="text-xl text-slate-700 dark:text-slate-200">{post.data.description}</p>
+          )}
+          {tags.length > 0 && (
+            <div class="flex flex-wrap gap-2 mt-4">
+              {tags.map((tag) => (
+                <a
+                  href={`/tags/${tag}`}
+                  class="px-3 py-1 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-slate-700 dark:to-slate-700 text-blue-700 dark:text-blue-200 rounded-full text-sm hover:from-blue-200 hover:to-cyan-200 transition-all font-medium"
+                >
+                  {tag}
+                </a>
+              ))}
+            </div>
+          )}
+        </header>
+        <TableOfContents lang="en" headings={headings} />
+        <div class="post-content prose prose-lg dark:prose-invert max-w-none">
+          {Content && <Content />}
+        </div>
+        <ShareButtons lang="en" title={title} url={pageUrl} />
+        <Comments lang="en" />
+        <CodeEnhancer />
+      </article>
+    )}
+    <RelatedPosts lang="en" posts={related} />
+  </PageShell>
 </BaseLayout>
-
-<style>
-  :global(.post-content h2) {
-    @apply text-3xl font-bold mt-12 mb-4 text-blue-700;
-  }
-  
-  :global(.post-content h3) {
-    @apply text-2xl font-bold mt-8 mb-3 text-cyan-600;
-  }
-  
-  :global(.post-content p) {
-    @apply mb-4 leading-relaxed text-gray-700;
-  }
-  
-  :global(.post-content a) {
-    @apply text-blue-600 hover:text-cyan-600 underline transition-colors;
-  }
-  
-  :global(.post-content code) {
-    @apply bg-blue-100 text-blue-800 px-1 py-0.5 rounded text-sm font-mono;
-  }
-  
-  :global(.post-content pre) {
-    @apply bg-gradient-to-r from-blue-50 to-cyan-50 border-2 border-blue-200 p-4 rounded-lg overflow-x-auto mb-4;
-  }
-  
-  :global(.post-content ul, .post-content ol) {
-    @apply mb-4 pl-6;
-  }
-  
-  :global(.post-content ul) {
-    @apply list-disc;
-  }
-  
-  :global(.post-content ol) {
-    @apply list-decimal;
-  }
-  
-  :global(.post-content blockquote) {
-    @apply border-l-4 border-blue-400 pl-4 italic text-slate-700 my-4 bg-slate-50 py-2 rounded-r;
-  }
-</style>
-
-

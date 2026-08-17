@@ -1,18 +1,24 @@
 ---
-const { currentLang, currentPath = '/' } = Astro.props;
-const otherLang = currentLang === 'en' ? 'tr' : 'en';
-// Replace the lang prefix and ensure trailing slash
-let otherLangPath = currentPath.replace(`/${currentLang}/`, `/${otherLang}/`);
-if (!otherLangPath.endsWith('/')) {
-  otherLangPath = `/${otherLang}/`;
+import { getHreflangUrls, normalizePath } from '../lib/hreflang';
+import { t, type Lang } from '../lib/i18n';
+
+interface Props {
+  lang?: Lang;
+  currentPath?: string;
 }
+
+const { lang = 'en', currentPath = '/' } = Astro.props;
+const path = normalizePath(currentPath);
+const hrefs = getHreflangUrls(path, Astro.site);
+const otherHref = new URL(lang === 'en' ? hrefs.tr : hrefs.en).pathname || '/';
+const otherLabel = lang === 'en' ? t('en', 'switchToTr') : t('tr', 'switchToEn');
 ---
 
 <a
-  href={otherLangPath}
-  class="px-4 py-2 rounded-lg bg-slate-700 text-white hover:bg-slate-800 transition-colors"
-  aria-label={`Switch to ${otherLang.toUpperCase()}`}
+  href={otherHref}
+  class="inline-flex items-center justify-center px-3 py-1.5 rounded-lg text-sm font-medium bg-white/20 hover:bg-white/30 text-white transition-colors"
+  hreflang={lang === 'en' ? 'tr' : 'en'}
+  lang={lang === 'en' ? 'tr' : 'en'}
 >
-  {otherLang.toUpperCase()}
+  {otherLabel}
 </a>
-

@@ -1,0 +1,57 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageShell from '@components/PageShell.astro';
+import PostList from '@components/PostList.astro';
+import Pagination from '@components/Pagination.astro';
+import SearchBox from '@components/SearchBox.astro';
+import { getCombinedPosts, paginatePosts } from '../lib/posts';
+import { t, type Lang } from '../lib/i18n';
+
+interface Props {
+  lang: Lang;
+  page?: number;
+}
+
+const lang = Astro.props.lang ?? 'en';
+const page = Astro.props.page ?? 1;
+const allPosts = await getCombinedPosts(lang);
+const paginated = paginatePosts(allPosts, page, lang);
+const currentPath = paginated.current <= 1
+  ? (lang === 'tr' ? '/tr/blog' : '/blog')
+  : (lang === 'tr' ? `/tr/blog/page/${paginated.current}` : `/blog/page/${paginated.current}`);
+---
+
+<BaseLayout
+  title={`${t(lang, 'blog')} - Ertugrul Kara`}
+  description={lang === 'tr'
+    ? 'Ertugrul Kara’nın yazılım mimarisi, mikroservisler, bulut ve mühendislik yazıları. Özetler bu sitede; tam makaleler Medium’da.'
+    : 'Technical articles by Ertugrul Kara on software architecture, microservices, cloud systems, and engineering. Short summaries live here; full articles are published on Medium.'}
+  lang={lang}
+  currentPath={currentPath}
+>
+  <PageShell lang={lang} currentPath={currentPath}>
+    <header class="mb-8">
+      <h1 class="text-5xl font-bold mb-3 text-gray-800 dark:text-slate-100">{t(lang, 'blog')}</h1>
+      <p class="text-xl text-gray-600 dark:text-slate-300 mb-6">
+        {lang === 'tr'
+          ? 'Yazılım mimarisi, mikroservisler, bulut ve mühendislik. Özetler burada; tam yazılar Medium’da.'
+          : 'Software architecture, microservices, cloud, and engineering. Summaries on this site; full articles on Medium.'}
+      </p>
+      <SearchBox lang={lang} />
+    </header>
+
+    <PostList posts={paginated.items} lang={lang} />
+
+    {paginated.total === 0 && (
+      <p class="text-center text-gray-500 dark:text-slate-400 mt-12">{t(lang, 'noPosts')}</p>
+    )}
+
+    <Pagination
+      lang={lang}
+      current={paginated.current}
+      totalPages={paginated.totalPages}
+      prevHref={paginated.prevHref}
+      nextHref={paginated.nextHref}
+    />
+  </PageShell>
+</BaseLayout>

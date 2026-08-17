@@ -1,0 +1,36 @@
+---
+import BaseLayout from '@layouts/BaseLayout.astro';
+import PageShell from '@components/PageShell.astro';
+import { getTagCounts } from '../../../lib/posts';
+import { localePath, t } from '../../../lib/i18n';
+
+const tags = await getTagCounts('tr');
+const max = tags[0]?.count || 1;
+---
+
+<BaseLayout
+  title={`${t('tr', 'tagCloudTitle')} - Ertugrul Kara`}
+  description="Yazıları etikete göre gezinin."
+  lang="tr"
+  currentPath="/tr/tags"
+>
+  <PageShell lang="tr" currentPath="/tr/tags">
+    <header class="mb-8">
+      <h1 class="text-4xl font-bold mb-3 text-gray-800 dark:text-slate-100">{t('tr', 'tagCloudTitle')}</h1>
+    </header>
+    <ul class="flex flex-wrap gap-3">
+      {tags.map(({ tag, count }) => (
+        <li>
+          <a
+            href={localePath('tr', `/tags/${tag}`)}
+            class="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-800 dark:text-blue-200 hover:bg-blue-100"
+            style={`font-size: ${0.9 + (count / max) * 0.6}rem`}
+          >
+            {tag}
+            <span class="text-xs text-gray-500 dark:text-slate-400">{count}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+  </PageShell>
+</BaseLayout>

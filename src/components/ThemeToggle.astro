@@ -1,0 +1,58 @@
+---
+import { t, type Lang } from '../lib/i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+---
+
+<button
+  type="button"
+  class="theme-toggle inline-flex items-center justify-center w-10 h-10 rounded-lg bg-white/20 hover:bg-white/30 text-white transition-colors"
+  aria-label={t(lang, 'darkMode')}
+  data-label-dark={t(lang, 'darkMode')}
+  data-label-light={t(lang, 'lightMode')}
+>
+  <svg class="w-5 h-5 theme-icon-moon" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+  </svg>
+  <svg class="w-5 h-5 theme-icon-sun hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+  </svg>
+</button>
+
+<script>
+  function syncThemeToggle() {
+    const root = document.documentElement;
+    const isDark = root.classList.contains('dark');
+    document.querySelectorAll('.theme-toggle').forEach((btn) => {
+      const button = btn as HTMLButtonElement;
+      const moon = button.querySelector('.theme-icon-moon');
+      const sun = button.querySelector('.theme-icon-sun');
+      moon?.classList.toggle('hidden', isDark);
+      sun?.classList.toggle('hidden', !isDark);
+      button.setAttribute('aria-label', isDark ? button.dataset.labelLight || 'Light mode' : button.dataset.labelDark || 'Dark mode');
+    });
+  }
+
+  function setTheme(next: 'dark' | 'light') {
+    document.documentElement.classList.toggle('dark', next === 'dark');
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      // ignore
+    }
+    syncThemeToggle();
+  }
+
+  document.querySelectorAll('.theme-toggle').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      setTheme(isDark ? 'light' : 'dark');
+    });
+  });
+
+  syncThemeToggle();
+</script>

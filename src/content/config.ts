@@ -5,9 +5,11 @@ const blogSchema = z.object({
   description: z.string().optional(),
   author: z.string().optional(),
   pubDate: z.date(),
+  updatedDate: z.date().optional(),
   tags: z.array(z.string()).optional(),
   image: z.string().optional(),
   lang: z.string(),
+  draft: z.boolean().optional().default(false),
 });
 
 const enPosts = defineCollection({
@@ -24,4 +26,3 @@ export const collections = {
   'en-posts': enPosts,
   'tr-posts': trPosts,
 };
-

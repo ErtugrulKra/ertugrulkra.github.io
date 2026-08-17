@@ -1,12 +1,16 @@
 ---
+import { t, type Lang } from '../lib/i18n';
+
 interface MediumPost {
   title: string;
-  link: string;
-  pubDate: string;
-  contentSnippet: string;
-  categories: string[];
-  guid: string;
-  author: string;
+  slug: string;
+  pubDate: Date | string;
+  description?: string;
+  contentSnippet?: string;
+  tags?: string[];
+  categories?: string[];
+  author?: string;
+  readingMinutes?: number;
 }
 
 interface Props {
@@ -15,53 +19,58 @@ interface Props {
 }
 
 const { post, lang } = Astro.props;
-
 const date = new Date(post.pubDate);
+const prefix = lang === 'tr' ? '/tr' : '';
+const tags = post.tags || post.categories || [];
+const summary = post.description || '';
+const uiLang = (lang === 'tr' ? 'tr' : 'en') as Lang;
 ---
 
 <article
-  class="border-2 border-gray-200 rounded-lg p-5 hover:shadow-xl transition-all bg-white shadow-sm hover:border-blue-500 hover:scale-105 transform"
-  data-post-card
-  data-url={post.link}
-  data-title={post.title}
-  data-description={post.contentSnippet || ''}
-  data-type="external"
+  class="h-full flex flex-col border-2 border-gray-200 dark:border-slate-700 rounded-lg p-5 hover:shadow-xl transition-all bg-white dark:bg-slate-800 shadow-sm hover:border-blue-500 motion-reduce:transform-none hover:scale-105 motion-reduce:hover:scale-100 transform"
 >
   <div class="flex items-center gap-2 mb-2">
     <span class="px-2 py-1 bg-blue-600 text-white rounded text-xs font-semibold shadow-sm">
       Medium
     </span>
   </div>
-  
+
   <h2 class="text-xl font-bold mb-2">
-    <a href={post.link} target="_blank" rel="noopener noreferrer" class="text-gray-800 hover:text-blue-600 transition-colors">
+    <a href={`${prefix}/blog/${post.slug}`} class="text-gray-800 dark:text-slate-100 hover:text-blue-600 transition-colors">
       {post.title}
     </a>
   </h2>
-  
-  {post.contentSnippet && <p class="text-gray-600 mb-4">{post.contentSnippet}</p>}
-  
-  <div class="flex flex-wrap gap-2 mb-4">
-    {post.categories.map((tag: string) => (
-      <span
-        class="px-2 py-1 bg-gray-100 text-gray-700 rounded text-sm font-medium"
-      >
-        {tag}
-      </span>
-    ))}
-  </div>
-  
-  <div class="flex items-center justify-between text-sm text-gray-500">
-    <time datetime={date.toISOString()}>
-      {date.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })}
-    </time>
-    <a href={post.link} target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1 font-medium">
-      {lang === 'en' ? 'Read on Medium →' : 'Medium\'da Oku →'}
+
+  {summary && <p class="text-gray-600 dark:text-slate-300 mb-4 line-clamp-3">{summary}</p>}
+
+  {tags.length > 0 && (
+    <div class="flex flex-wrap gap-2">
+      {tags.map((tag: string) => (
+        <a
+          href={`${prefix}/tags/${tag}`}
+          class="px-2 py-1 bg-gray-100 dark:bg-slate-700 text-gray-700 dark:text-slate-200 rounded text-sm hover:bg-blue-100 hover:text-blue-700 transition-all font-medium"
+        >
+          {tag}
+        </a>
+      ))}
+    </div>
+  )}
+
+  <div class="mt-auto pt-4 flex items-end justify-between gap-3 text-sm text-gray-500 dark:text-slate-400">
+    <div class="flex flex-wrap items-center gap-x-2 gap-y-0.5 min-w-0">
+      <time datetime={date.toISOString()}>
+        {date.toLocaleDateString(lang === 'en' ? 'en-US' : 'tr-TR', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}
+      </time>
+      {post.readingMinutes && (
+        <span class="whitespace-nowrap">· {post.readingMinutes} {t(uiLang, 'minRead')}</span>
+      )}
+    </div>
+    <a href={`${prefix}/blog/${post.slug}`} class="shrink-0 whitespace-nowrap text-blue-600 dark:text-blue-400 hover:underline font-medium">
+      {t(uiLang, 'readSummary')}
     </a>
   </div>
 </article>
-

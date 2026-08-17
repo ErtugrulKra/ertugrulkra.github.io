@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '@layouts/BaseLayout.astro';
+import PageShell from '@components/PageShell.astro';
 
 const experience = [
   {
@@ -7,7 +8,9 @@ const experience = [
     company: 'Odeon Yazılım ve Teknoloji',
     location: 'Türkiye',
     responsibilities: [
-     
+      'Ürün mühendisliği ekipleri için yazılım mimarisi ve teknik yön belirleme.',
+      'Ölçeklenebilir servisler tasarlama; bulut, entegrasyon ve teslimat pratiklerinde rehberlik.',
+      'Teknik çözümleri iş hedefleriyle hizalamak için paydaşlarla çalışma.',
     ],
   },
   {
@@ -91,48 +94,48 @@ const certifications = [
 
 <BaseLayout
   title="Hakkımda - Ertugrul Kara"
-  description="Ertugrul Kara hakkında, yazılım geliştirici"
+  description="Ertugrul Kara, mikroservisler, bulut e-Fatura sistemleri ve mühendislik liderliği üzerine çalışan yazılım mimarı."
   lang="tr"
-  currentPath="/tr/about/"
+  currentPath="/tr/about"
 >
-  <div class="container mx-auto px-4 py-16 max-w-4xl">
+  <PageShell lang="tr" currentPath="/tr/about">
     <header class="mb-12">
-      <h1 class="text-4xl font-bold mb-4">Hakkımda</h1>
-      <p class="text-xl text-slate-600">
+      <h1 class="text-4xl font-bold mb-4 text-gray-800 dark:text-slate-100">Hakkımda</h1>
+      <p class="text-xl text-slate-600 dark:text-slate-300">
         Mikroservisler, bulut bilişim ve kurumsal çözümler konularına tutkulu, deneyimli yazılım mühendisi ve ekip lideri.
       </p>
     </header>
 
     <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">Profesyonel Özet</h2>
-      <p class="text-slate-700 mb-4 leading-relaxed">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-slate-100">Profesyonel Özet</h2>
+      <p class="text-slate-700 dark:text-slate-300 mb-4 leading-relaxed">
         Ölçeklenebilir yazılım sistemleri tasarlamayı ve mühendislik ekipleriyle çalışmayı seven bir yazılım mimarı. 
         Bulut tabanlı e-Fatura ve e-İmza sistemleri, dağıtık uygulamalar ve mikroservis framework'leri konularına meraklı.
       </p>
-      <p class="text-slate-700 leading-relaxed">
+      <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
         Modern teknolojileri öğrenmeye hevesli, geliştirme süreçlerini iyileştirmeye istekli ve teknik çözümleri iş hedefleriyle buluşturmaktan hoşlanan biri. 
         Farklı endüstrilerde Agile ekip yönetimi, DevOps uygulamaları ve yazılım çözümleri sunma konularında deneyimli.
       </p>
     </section>
 
     <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">İletişim</h2>
-      <div class="space-y-2">
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-slate-100">İletişim</h2>
+      <div class="space-y-2 text-gray-800 dark:text-slate-100">
         <p>
           <strong>E-posta:</strong>{' '}
-          <a href="mailto:hello@ertugrulkara.com" class="hover:underline text-slate-600">
+          <a href="mailto:hello@ertugrulkara.com" class="hover:underline text-blue-600 dark:text-blue-400">
             hello@ertugrulkara.com
           </a>
         </p>
         <p>
           <strong>GitHub:</strong>{' '}
-          <a href="https://github.com/ertugrulkra" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-600">
+          <a href="https://github.com/ertugrulkra" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-600 dark:text-blue-400">
             github.com/ertugrulkra
           </a>
         </p>
         <p>
           <strong>LinkedIn:</strong>{' '}
-          <a href="https://www.linkedin.com/in/ertugrul-kra/" target="_blank" rel="noopener noreferrer" class="hover:underline text-slate-600">
+          <a href="https://www.linkedin.com/in/ertugrul-kra/" target="_blank" rel="noopener noreferrer" class="hover:underline text-blue-600 dark:text-blue-400">
             linkedin.com/in/ertugrul-kra
           </a>
         </p>
@@ -140,13 +143,13 @@ const certifications = [
     </section>
 
     <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">İş Deneyimi</h2>
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-slate-100">İş Deneyimi</h2>
       <div class="space-y-8">
         {experience.map((exp) => (
-          <div class="border-l-4 border-slate-500 pl-6 bg-slate-50 p-4 rounded-r-lg">
-            <h3 class="font-bold text-lg text-slate-800">{exp.title}</h3>
-            <p class="text-slate-600 font-medium">{exp.company} • {exp.location}</p>
-            <ul class="list-disc list-inside space-y-1 text-slate-700 mt-3">
+          <div class="border-l-4 border-blue-500 pl-6 bg-slate-50 dark:bg-slate-800 p-4 rounded-r-lg">
+            <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100">{exp.title}</h3>
+            <p class="text-slate-600 dark:text-slate-400 font-medium">{exp.company} • {exp.location}</p>
+            <ul class="list-disc list-inside space-y-1 text-slate-700 dark:text-slate-300 mt-3">
               {exp.responsibilities.map((resp) => (
                 <li>{resp}</li>
               ))}
@@ -157,22 +160,22 @@ const certifications = [
     </section>
 
     <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">Eğitim</h2>
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-slate-100">Eğitim</h2>
       <div class="space-y-4">
         {education.map((edu) => (
-          <div class="bg-slate-50 p-4 rounded-lg">
-            <h3 class="font-bold text-slate-800">{edu.degree}</h3>
-            <p class="text-slate-600">{edu.institution} • {edu.location}</p>
+          <div class="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg border border-transparent dark:border-slate-700">
+            <h3 class="font-bold text-slate-800 dark:text-slate-100">{edu.degree}</h3>
+            <p class="text-slate-600 dark:text-slate-400">{edu.institution} • {edu.location}</p>
           </div>
         ))}
       </div>
     </section>
 
     <section class="mb-12">
-      <h2 class="text-2xl font-bold mb-4">Sertifikalar</h2>
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-slate-100">Sertifikalar</h2>
       <div class="grid md:grid-cols-2 gap-3">
         {certifications.map((cert) => (
-          <div class="bg-slate-50 p-3 rounded-lg text-sm text-slate-700">
+          <div class="bg-slate-50 dark:bg-slate-800 p-3 rounded-lg text-sm text-slate-700 dark:text-slate-300 border border-transparent dark:border-slate-700">
             {cert}
           </div>
         ))}
@@ -180,17 +183,17 @@ const certifications = [
     </section>
 
     <section>
-      <h2 class="text-2xl font-bold mb-4">Diller</h2>
+      <h2 class="text-2xl font-bold mb-4 text-gray-800 dark:text-slate-100">Diller</h2>
       <div class="space-y-2">
-        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg">
-          <span class="font-medium text-slate-800">Türkçe</span>
-          <span class="text-sm text-slate-600">Anadil</span>
+        <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
+          <span class="font-medium text-slate-800 dark:text-slate-100">Türkçe</span>
+          <span class="text-sm text-slate-600 dark:text-slate-400">Anadil</span>
         </div>
-        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-lg">
-          <span class="font-medium text-slate-800">İngilizce</span>
-          <span class="text-sm text-slate-600">B2 Seviye</span>
+        <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-800 p-3 rounded-lg border border-transparent dark:border-slate-700">
+          <span class="font-medium text-slate-800 dark:text-slate-100">İngilizce</span>
+          <span class="text-sm text-slate-600 dark:text-slate-400">B2 Seviye</span>
         </div>
       </div>
     </section>
-  </div>
+  </PageShell>
 </BaseLayout>

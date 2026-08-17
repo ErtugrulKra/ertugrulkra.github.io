@@ -1,0 +1,81 @@
+---
+import ShareButtons from './ShareButtons.astro';
+import { mediumUrlWithUtm, uniqueSummary, type MediumPost } from '../lib/medium';
+import { t, type Lang } from '../lib/i18n';
+
+interface Props {
+  post: MediumPost;
+  lang: 'en' | 'tr';
+  readingMinutes?: number;
+  pageUrl: string;
+}
+
+const { post, lang, readingMinutes, pageUrl } = Astro.props;
+const date = new Date(post.pubDate);
+const summary = uniqueSummary(post, lang);
+const mediumHref = mediumUrlWithUtm(post.link);
+const prefix = lang === 'tr' ? '/tr' : '';
+const tags = post.categories || [];
+const uiLang = lang as Lang;
+---
+
+<article>
+  <header class="mb-10">
+    <div class="flex items-center gap-2 mb-4">
+      <span class="px-2 py-1 bg-blue-600 text-white rounded text-xs font-semibold">Medium</span>
+      <span class="text-sm text-slate-500 dark:text-slate-400">
+        {t(uiLang, 'fullOnMedium')}
+      </span>
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+      {post.title}
+    </h1>
+    <div class="flex flex-wrap items-center gap-4 text-slate-600 dark:text-slate-300 mb-6">
+      <time datetime={date.toISOString()}>
+        {date.toLocaleDateString(lang === 'tr' ? 'tr-TR' : 'en-US', {
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+        })}
+      </time>
+      {post.author && <span>{t(uiLang, 'by')} {post.author}</span>}
+      {readingMinutes && <span>{readingMinutes} {t(uiLang, 'minRead')}</span>}
+    </div>
+    {tags.length > 0 && (
+      <div class="flex flex-wrap gap-2">
+        {tags.map((tag) => (
+          <a
+            href={`${prefix}/tags/${tag}`}
+            class="px-3 py-1 bg-gradient-to-r from-blue-100 to-cyan-100 dark:from-slate-700 dark:to-slate-700 text-blue-700 dark:text-blue-200 rounded-full text-sm hover:from-blue-200 hover:to-cyan-200 transition-all font-medium no-underline"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+    )}
+  </header>
+
+  <p class="text-xl text-slate-700 dark:text-slate-200 leading-relaxed mb-8">{summary}</p>
+
+  <ul class="mb-10 text-slate-700 dark:text-slate-300 list-disc pl-6 space-y-2">
+    <li>{lang === 'tr' ? 'Bu sayfa keşif ve arşiv özetidir; tam metin kopyalanmaz.' : 'This page is a discovery summary; the full text is not republished here.'}</li>
+    <li>{lang === 'tr' ? `Konular: ${(tags.length ? tags : ['yazılım']).join(', ')}.` : `Topics: ${(tags.length ? tags : ['software']).join(', ')}.`}</li>
+    <li>{lang === 'tr' ? 'Ayrıntılar, örnekler ve tam anlatım Medium’daki orijinal yazıdadır.' : 'Details, examples, and the full walkthrough are on Medium.'}</li>
+  </ul>
+
+  <p class="text-sm text-slate-500 dark:text-slate-400 mb-6">
+    {lang === 'tr' ? 'Originally on Medium.' : 'Originally published on Medium.'}
+  </p>
+
+  <a
+    href={mediumHref}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium no-underline"
+  >
+    {lang === 'tr' ? 'Medium’da oku' : 'Read the full article on Medium'}
+    <span aria-hidden="true">→</span>
+  </a>
+
+  <ShareButtons lang={uiLang} title={post.title} url={pageUrl} />
+</article>

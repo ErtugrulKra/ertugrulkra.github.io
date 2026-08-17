@@ -1,5 +1,17 @@
 ---
-import PostPreview from '@components/PostPreview.astro';
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+import '../styles/main.css';
+import Analytics from '../components/Analytics.astro';
+import { getHreflangUrls, normalizePath } from '../lib/hreflang';
+import { t, type Lang } from '../lib/i18n';
+
+interface BreadcrumbItem {
+  name: string;
+  href: string;
+}
 
 interface Props {
   title: string;
@@ -12,6 +24,11 @@ interface Props {
   modifiedTime?: string;
   authorName?: string;
   tags?: string[];
+  sameAs?: string;
+  headline?: string;
+  hasLanguageAlternate?: boolean;
+  breadcrumbs?: BreadcrumbItem[];
+  noindex?: boolean;
 }
 
 const {
@@ -24,18 +41,67 @@ const {
   publishedTime,
   modifiedTime,
   authorName = 'Ertugrul Kara',
-  tags = []
+  tags = [],
+  sameAs,
+  headline,
+  hasLanguageAlternate = true,
+  breadcrumbs = [],
+  noindex = false,
 } = Astro.props as Props;
-const canonical = new URL(currentPath, Astro.site);
-const ogImage = image || new URL('/og-image.png', Astro.site).href;
-const counterpart =
-  lang === 'en'
-    ? canonical.href.replace('/en/', '/tr/')
-    : canonical.href.replace('/tr/', '/en/');
-const xDefault =
-  lang === 'en'
-    ? canonical.href
-    : canonical.href.replace('/tr/', '/en/');
+
+const uiLang = (lang === 'tr' ? 'tr' : 'en') as Lang;
+const site = Astro.site || new URL('https://blog.ertugrulkara.com');
+const path = normalizePath(currentPath);
+const canonical = new URL(path, site);
+const ogImage = image
+  ? (image.startsWith('http') ? image : new URL(image, site).href)
+  : new URL('/og-image.png', site).href;
+const hreflang = getHreflangUrls(path, site);
+const rssHref = uiLang === 'tr' ? new URL('/tr/rss.xml', site).href : new URL('/rss.xml', site).href;
+const twitterHandle = import.meta.env.PUBLIC_TWITTER_HANDLE as string | undefined;
+
+const articleJsonLd = type === 'article'
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: headline || title,
+      description,
+      image: [ogImage],
+      author: {
+        '@type': 'Person',
+        name: authorName,
+        url: new URL('/', site).href,
+      },
+      publisher: {
+        '@type': 'Person',
+        name: authorName,
+        url: new URL('/', site).href,
+      },
+      datePublished: publishedTime || undefined,
+      dateModified: modifiedTime || publishedTime || undefined,
+      inLanguage: lang,
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': canonical.href,
+      },
+      url: canonical.href,
+      keywords: tags.length > 0 ? tags.join(', ') : undefined,
+      ...(sameAs ? { sameAs: [sameAs] } : {}),
+    }
+  : null;
+
+const breadcrumbJsonLd = breadcrumbs.length > 0
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: breadcrumbs.map((item, index) => ({
+        '@type': 'ListItem',
+        position: index + 1,
+        name: item.name,
+        item: new URL(item.href, site).href,
+      })),
+    }
+  : null;
 ---
 
 <!DOCTYPE html>
@@ -44,20 +110,20 @@ const xDefault =
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
-    <meta name="googlebot" content="index, follow" />
+    <meta name="robots" content={noindex ? 'noindex, follow' : 'index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1'} />
+    <meta name="googlebot" content={noindex ? 'noindex, follow' : 'index, follow'} />
     <meta name="author" content={authorName} />
     <meta name="language" content={lang} />
-    
+
     <title>{title}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    
-    <!-- Additional SEO Meta Tags -->
+    <link rel="alternate" type="application/rss+xml" title="Ertugrul Kara RSS" href={rssHref} />
+
     <meta name="theme-color" content="#2563eb" />
+    <meta name="color-scheme" content="light dark" />
     <meta name="format-detection" content="telephone=no" />
-    
-    <!-- Open Graph -->
+
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={type} />
@@ -67,10 +133,10 @@ const xDefault =
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="Ertugrul Kara" />
     <meta property="og:locale" content={lang === 'en' ? 'en_US' : 'tr_TR'} />
-    {lang === 'tr' && (
+    {hasLanguageAlternate && lang === 'tr' && (
       <meta property="og:locale:alternate" content="en_US" />
     )}
-    {lang === 'en' && (
+    {hasLanguageAlternate && lang === 'en' && (
       <meta property="og:locale:alternate" content="tr_TR" />
     )}
     {type === 'article' && publishedTime && (
@@ -82,122 +148,97 @@ const xDefault =
     {type === 'article' && (
       <meta property="article:author" content={authorName} />
     )}
-    {type === 'article' && tags.map((t) => (
-      <meta property="article:tag" content={t} />
+    {type === 'article' && tags.map((tagName) => (
+      <meta property="article:tag" content={tagName} />
     ))}
-    
-    <!-- Twitter Card -->
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={title} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImage} />
-    
-    <!-- Hreflang -->
-    <link rel="alternate" hreflang="x-default" href={xDefault} />
-    {lang === 'en' ? (
+    {twitterHandle && (
       <>
-        <link rel="alternate" hreflang="en" href={canonical} />
-        <link rel="alternate" hreflang="tr" href={counterpart} />
+        <meta name="twitter:site" content={twitterHandle} />
+        <meta name="twitter:creator" content={twitterHandle} />
+      </>
+    )}
+
+    {hasLanguageAlternate ? (
+      <>
+        <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />
+        <link rel="alternate" hreflang="en" href={hreflang.en} />
+        <link rel="alternate" hreflang="tr" href={hreflang.tr} />
       </>
     ) : (
       <>
-        <link rel="alternate" hreflang="tr" href={canonical} />
-        <link rel="alternate" hreflang="en" href={counterpart} />
+        <link rel="alternate" hreflang={lang} href={canonical.href} />
+        <link rel="alternate" hreflang="x-default" href={hreflang.xDefault} />
       </>
     )}
-    
-    <!-- Favicon -->
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    
-    <!-- Styles -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    
-    <!-- Lunr.js for search -->
-    <script src="https://unpkg.com/lunr@2.3.9/lunr.min.js"></script>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
 
-    <!-- Structured Data: WebSite -->
-    <script type="application/ld+json">
-      {JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'WebSite',
-        name: 'Ertugrul Kara',
-        url: new URL('/', Astro.site).href,
-        description: 'Personal website and blog of Ertugrul Kara - Software Engineer, Architect',
-        inLanguage: lang,
-        potentialAction: {
-          '@type': 'SearchAction',
-          target: {
-            '@type': 'EntryPoint',
-            urlTemplate: new URL('/search?q={search_term_string}', Astro.site).href
-          },
-          'query-input': 'required name=search_term_string'
+    <script is:inline>
+      try {
+        const stored = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (stored === 'dark' || (!stored && prefersDark)) {
+          document.documentElement.classList.add('dark');
         }
-      })}
+      } catch (e) {}
     </script>
 
-    <!-- Structured Data: Person (Publisher) -->
-    <script type="application/ld+json">
-      {JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'Person',
-        name: 'Ertugrul Kara',
-        url: new URL('/', Astro.site).href,
-        jobTitle: 'Software Engineer, Architect',
-        description: 'Software architect who enjoys designing scalable software systems and working with engineering teams.',
-        sameAs: [
-          'https://github.com/ertugrulkra',
-          'https://www.linkedin.com/in/ertugrul-kra/',
-          'https://medium.com/@ertugrulkra'
-        ],
-        email: 'hello@ertugrulkara.com',
-        image: new URL('/avatar.jpg', Astro.site).href
-      })}
-    </script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: 'Ertugrul Kara',
+      url: new URL('/', site).href,
+      description: 'Personal website and blog of Ertugrul Kara - Software Engineer, Architect',
+      inLanguage: lang,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: lang === 'tr'
+            ? `${new URL('/tr/search', site).href}?q={search_term_string}`
+            : `${new URL('/search', site).href}?q={search_term_string}`
+        },
+        'query-input': 'required name=search_term_string'
+      }
+    })} />
 
-    {type === 'article' && (
-      <script type="application/ld+json">
-        {JSON.stringify({
-          '@context': 'https://schema.org',
-          '@type': 'Article',
-          headline: title,
-          description,
-          image: [ogImage],
-          author: {
-            '@type': 'Person',
-            name: authorName,
-            url: new URL('/', Astro.site).href
-          },
-          publisher: {
-            '@type': 'Person',
-            name: authorName,
-            url: new URL('/', Astro.site).href
-          },
-          datePublished: publishedTime || undefined,
-          dateModified: modifiedTime || publishedTime || undefined,
-          inLanguage: lang,
-          mainEntityOfPage: {
-            '@type': 'WebPage',
-            '@id': canonical.href
-          },
-          keywords: tags.length > 0 ? tags.join(', ') : undefined
-        })}
-      </script>
+    <script is:inline type="application/ld+json" set:html={JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Person',
+      name: 'Ertugrul Kara',
+      url: new URL('/', site).href,
+      jobTitle: 'Software Engineer, Architect',
+      description: 'Software architect who enjoys designing scalable software systems and working with engineering teams.',
+      sameAs: [
+        'https://github.com/ertugrulkra',
+        'https://www.linkedin.com/in/ertugrul-kra/',
+        'https://medium.com/@ertugrulkra'
+      ],
+      email: 'hello@ertugrulkara.com',
+      image: new URL('/avatar.png', site).href
+    })} />
+
+    {articleJsonLd && (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(articleJsonLd)} />
     )}
+    {breadcrumbJsonLd && (
+      <script is:inline type="application/ld+json" set:html={JSON.stringify(breadcrumbJsonLd)} />
+    )}
+    <Analytics />
   </head>
-  <body class="font-sans">
+  <body class="font-sans bg-white text-gray-800 dark:bg-slate-900 dark:text-slate-100">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded-lg"
+    >
+      {t(uiLang, 'skipToContent')}
+    </a>
     <slot />
   </body>
 </html>
-
-<style is:global>
-  :root {
-    --font-sans: 'Inter', sans-serif;
-  }
-  
-  html {
-    font-family: var(--font-sans);
-  }
-</style>
-

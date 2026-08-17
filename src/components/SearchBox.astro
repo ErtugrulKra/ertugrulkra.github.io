@@ -1,19 +1,48 @@
 ---
+import { t, type Lang } from '../lib/i18n';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
 ---
 
 <div class="relative mb-8">
+  <label for="search-box" class="sr-only">{t(lang, 'search')}</label>
   <input
     type="search"
     id="search-box"
-    placeholder="Search posts..."
-    class="w-full px-4 py-3 rounded-lg border border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    placeholder={t(lang, 'searchPlaceholder')}
+    class="w-full px-4 py-3 rounded-lg border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-gray-900 dark:text-slate-100 placeholder-gray-500 dark:placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    autocomplete="off"
+    data-lang={lang}
+    data-empty={t(lang, 'noResults')}
   />
-  <div id="search-results" class="hidden mt-2 space-y-2"></div>
+  <div
+    id="search-results"
+    class="hidden mt-2 space-y-2"
+    role="status"
+    aria-live="polite"
+  ></div>
 </div>
 
+<script is:inline src="/vendor/lunr.min.js"></script>
 <script>
-  let idx: any = null;
-  let posts: any[] = [];
+  type SearchPost = {
+    id: string;
+    slug: string;
+    title: string;
+    description?: string;
+    lang?: string;
+  };
+
+  let idx: { search: (q: string) => { ref: string; score: number }[] } | null = null;
+  let posts: SearchPost[] = [];
+
+  function postHref(post: SearchPost) {
+    return post.lang === 'tr' ? `/tr/blog/${post.slug}` : `/blog/${post.slug}`;
+  }
 
   async function initSearch() {
     try {
@@ -21,68 +50,104 @@
       if (!response.ok) return;
       const indexData = await response.json();
       posts = indexData.posts || [];
-      
-      if (typeof window !== 'undefined' && (window as any).lunr) {
-        idx = (window as any).lunr.Index.load(indexData.index);
+      const lunr = (window as unknown as { lunr?: { Index: { load: (data: unknown) => typeof idx } } }).lunr;
+      if (lunr) {
+        idx = lunr.Index.load(indexData.index);
       }
     } catch (error) {
       console.error('Failed to load search index:', error);
     }
   }
 
-  function performSearch(query: string) {
+  function performSearch(query: string, lang: string) {
     if (!idx || !posts.length) return [];
-    
+
     try {
       const results = idx.search(query);
-      return results.map((result: any) => {
-        const post = posts.find((p: any) => p.slug === result.ref);
-        return post ? { ...post, score: result.score } : null;
-      }).filter(Boolean).slice(0, 10);
+      return results
+        .map((result) => {
+          const post = posts.find((item) => item.id === result.ref || item.slug === result.ref);
+          return post ? { ...post, score: result.score } : null;
+        })
+        .filter((post): post is SearchPost & { score: number } => Boolean(post))
+        .filter((post) => !lang || post.lang === lang)
+        .slice(0, 10);
     } catch (error) {
       console.error('Search error:', error);
       return [];
     }
   }
 
-  const searchBox = document.getElementById('search-box');
+  const searchBox = document.getElementById('search-box') as HTMLInputElement | null;
   const resultsDiv = document.getElementById('search-results');
+  const emptyLabel = searchBox?.dataset.empty || 'No results found.';
+  const currentLang = searchBox?.dataset.lang || 'en';
+
+  function renderResults(query: string) {
+    if (!resultsDiv) return;
+    resultsDiv.replaceChildren();
+
+    if (query.length < 2) {
+      resultsDiv.classList.add('hidden');
+      return;
+    }
+
+    const results = performSearch(query, currentLang);
+    if (results.length === 0) {
+      const empty = document.createElement('p');
+      empty.className = 'text-gray-500 dark:text-slate-400';
+      empty.textContent = emptyLabel;
+      resultsDiv.appendChild(empty);
+      resultsDiv.classList.remove('hidden');
+      return;
+    }
+
+    const fragment = document.createDocumentFragment();
+    for (const post of results) {
+      const link = document.createElement('a');
+      link.href = postHref(post);
+      link.className =
+        'block p-3 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-800';
+
+      const heading = document.createElement('h3');
+      heading.className = 'font-semibold text-gray-900 dark:text-slate-100';
+      heading.textContent = post.title;
+      link.appendChild(heading);
+
+      if (post.description) {
+        const desc = document.createElement('p');
+        desc.className = 'text-sm text-gray-600 dark:text-slate-400 mt-1';
+        desc.textContent = post.description;
+        link.appendChild(desc);
+      }
+
+      fragment.appendChild(link);
+    }
+    resultsDiv.appendChild(fragment);
+    resultsDiv.classList.remove('hidden');
+  }
 
   if (typeof window !== 'undefined') {
-    initSearch();
+    initSearch().then(() => {
+      const params = new URLSearchParams(window.location.search);
+      const q = params.get('q');
+      if (q && searchBox) {
+        searchBox.value = q;
+        renderResults(q.trim());
+      }
+    });
 
     let debounceTimer: ReturnType<typeof setTimeout>;
-    searchBox?.addEventListener('input', (e) => {
+    searchBox?.addEventListener('input', (event) => {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-        const query = (e.target as HTMLInputElement).value.trim();
-        if (query.length < 2) {
-          resultsDiv?.classList.add('hidden');
-          if (resultsDiv) resultsDiv.innerHTML = '';
-          return;
-        }
-
-        const results = performSearch(query);
-        
-        if (!resultsDiv) return;
-        
-        if (results.length === 0) {
-          resultsDiv.innerHTML = '<p class="text-gray-500">No results found.</p>';
-          resultsDiv.classList.remove('hidden');
-          return;
-        }
-
-        resultsDiv.innerHTML = results.map((post: any) => `
-          <a href="/${post.lang}/blog/${post.slug}" class="block p-3 border border-gray-300 rounded-lg hover:bg-gray-100">
-            <h3 class="font-semibold">${post.title}</h3>
-            ${post.description ? `<p class="text-sm text-gray-600 mt-1">${post.description}</p>` : ''}
-          </a>
-        `).join('');
-        
-        resultsDiv.classList.remove('hidden');
+        const query = (event.target as HTMLInputElement).value.trim();
+        const url = new URL(window.location.href);
+        if (query) url.searchParams.set('q', query);
+        else url.searchParams.delete('q');
+        window.history.replaceState({}, '', url);
+        renderResults(query);
       }, 300);
     });
   }
 </script>
-
-
